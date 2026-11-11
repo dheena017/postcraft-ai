@@ -44,3 +44,6 @@ Thumbs.db
 # Temporary and local database backups
 data/*.tmp
 
+# Netlify
+.netlify
+
