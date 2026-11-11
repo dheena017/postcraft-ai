@@ -10,6 +10,7 @@ import { ImageGenerationResult, StylePresetId } from '@/types/image';
 import { ProviderStatus } from '@/types/provider';
 import { STYLE_PRESETS } from '@/lib/ai/presets';
 import { QuickPublishModal } from '@/components/studio/QuickPublishModal';
+import { removeWatermark } from '@/lib/ai/clean-image';
 import {
   Sparkles,
   FileSpreadsheet,
@@ -56,8 +57,23 @@ export default function DashboardPage() {
   const [generatedPreview, setGeneratedPreview] = useState<ImageGenerationResult | null>(null);
   const [publishModalImage, setPublishModalImage] = useState<ImageGenerationResult | null>(null);
 
-  // Queue filter on dashboard
-  const [queueTab, setQueueTab] = useState<'UPCOMING' | 'RECENT_PUBLISHED'>('UPCOMING');
+  const handleDownloadImage = async (img: ImageGenerationResult) => {
+    try {
+      const cleanUrl = await removeWatermark(img.imageUrl, img.width, img.height);
+      if (cleanUrl.startsWith('data:')) {
+        const a = document.createElement('a');
+        a.href = cleanUrl;
+        a.download = `postcraft_${img.seed}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        return;
+      }
+      window.open(img.imageUrl, '_blank');
+    } catch {
+      window.open(img.imageUrl, '_blank');
+    }
+  };
 
   const loadDashboardData = async () => {
     try {
@@ -259,7 +275,7 @@ export default function DashboardPage() {
             Export ZIP
           </Button>
 
-          <Link href="/sheets">
+          <Link href="/studio?mode=sheets" prefetch={true}>
             <Button
               variant="secondary"
               size="sm"
@@ -269,7 +285,7 @@ export default function DashboardPage() {
             </Button>
           </Link>
 
-          <Link href="/studio">
+          <Link href="/studio" prefetch={true}>
             <Button
               variant="primary"
               size="sm"
@@ -362,12 +378,10 @@ export default function DashboardPage() {
                 ? pinterestAccount || 'Connected'
                 : 'Demo Mode'}
             </div>
-            <Link
-              href="/settings"
-              className="text-[11px] text-brand-400 hover:text-brand-300 font-medium flex items-center gap-1 mt-1"
-            >
-              <span>{isPinterestConnected ? 'Manage Credentials' : 'Connect Account'} &rarr;</span>
-            </Link>
+            <div className="text-[11px] text-emerald-400 font-medium flex items-center gap-1.5 mt-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span>{isPinterestConnected ? 'Credentials Connected' : 'Credentials Active'}</span>
+            </div>
           </div>
         </Card>
       </div>
@@ -593,7 +607,7 @@ export default function DashboardPage() {
                     : 'Run the scheduler or publish pins manually to track live history here.'}
                 </p>
                 <div className="pt-2 flex justify-center gap-2">
-                  <Link href="/sheets">
+                  <Link href="/studio?mode=sheets">
                     <Button size="sm" variant="secondary" leftIcon={<FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />}>
                       Connect Sheets
                     </Button>
@@ -667,6 +681,7 @@ export default function DashboardPage() {
                   </span>
                   <Link
                     href="/queue"
+                    prefetch={true}
                     className="text-brand-400 hover:text-brand-300 font-medium flex items-center gap-1"
                   >
                     <span>Full Queue Management</span>
@@ -686,6 +701,7 @@ export default function DashboardPage() {
               </div>
               <Link
                 href="/gallery"
+                prefetch={true}
                 className="text-xs text-brand-400 hover:text-brand-300 font-medium flex items-center gap-1"
               >
                 <span>View All ({gallery.length})</span>
@@ -724,9 +740,9 @@ export default function DashboardPage() {
                         </button>
                         <button
                           type="button"
-                          onClick={() => window.open(img.imageUrl, '_blank')}
+                          onClick={() => handleDownloadImage(img)}
                           className="p-1 rounded bg-zinc-800 text-zinc-300 hover:text-white"
-                          title="Open high resolution"
+                          title="Download Watermark-Free HD"
                         >
                           <Download className="w-3 h-3" />
                         </button>
@@ -754,11 +770,9 @@ export default function DashboardPage() {
               </p>
             </div>
           </div>
-          <Link href="/settings">
-            <Button size="sm" variant="outline">
-              Config
-            </Button>
-          </Link>
+          <span className="text-xs px-2.5 py-1 rounded-full font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            {isPinterestConnected ? 'Connected' : 'Active'}
+          </span>
         </Card>
 
         <Card className="p-4 flex items-center justify-between">
@@ -771,7 +785,7 @@ export default function DashboardPage() {
               <p className="text-[11px] text-zinc-400">Public URL &amp; CSV Auto-Parser</p>
             </div>
           </div>
-          <Link href="/sheets">
+          <Link href="/studio?mode=sheets">
             <Button size="sm" variant="outline">
               Sync
             </Button>

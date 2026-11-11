@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Download, Share2, Sparkles, Maximize2, ShieldCheck } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { QuickPublishModal } from './QuickPublishModal';
 import { ImageGenerationResult } from '@/types/image';
+import { removeWatermark } from '@/lib/ai/clean-image';
 
 interface ImagePreviewCanvasProps {
   imageResult: ImageGenerationResult | null;
@@ -17,11 +18,39 @@ export const ImagePreviewCanvas: React.FC<ImagePreviewCanvasProps> = ({
 }) => {
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
+  const [cleanImageUrl, setCleanImageUrl] = useState<string>('');
+
+  useEffect(() => {
+    if (imageResult?.imageUrl) {
+      removeWatermark(imageResult.imageUrl, imageResult.width, imageResult.height).then((clean) => {
+        setCleanImageUrl(clean);
+      });
+    } else {
+      setCleanImageUrl('');
+    }
+  }, [imageResult]);
+
+  const activeUrl = cleanImageUrl || imageResult?.imageUrl || '';
 
   const handleDownload = async () => {
     if (!imageResult) return;
     try {
-      const response = await fetch(imageResult.imageUrl);
+      let downloadUrl = cleanImageUrl;
+      if (!downloadUrl) {
+        downloadUrl = await removeWatermark(imageResult.imageUrl, imageResult.width, imageResult.height);
+      }
+
+      if (downloadUrl.startsWith('data:')) {
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = `postcraft_${imageResult.aspectRatio.replace(':', 'x')}_${Date.now()}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        return;
+      }
+
+      const response = await fetch(downloadUrl);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -70,7 +99,7 @@ export const ImagePreviewCanvas: React.FC<ImagePreviewCanvasProps> = ({
             <div className="relative group w-full rounded-2xl overflow-hidden border border-zinc-800/90 shadow-2xl shadow-black bg-zinc-900/50">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={imageResult.imageUrl}
+                src={activeUrl}
                 alt={imageResult.prompt}
                 className="w-full h-auto max-h-[540px] object-contain mx-auto transition-transform duration-300 group-hover:scale-[1.01]"
               />
@@ -128,7 +157,7 @@ export const ImagePreviewCanvas: React.FC<ImagePreviewCanvasProps> = ({
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={imageResult.imageUrl}
+            src={activeUrl}
             alt={imageResult.prompt}
             className="max-h-[92vh] max-w-[92vw] rounded-xl object-contain shadow-2xl border border-zinc-800"
           />
@@ -140,7 +169,7 @@ export const ImagePreviewCanvas: React.FC<ImagePreviewCanvasProps> = ({
         <QuickPublishModal
           isOpen={isPublishModalOpen}
           onClose={() => setIsPublishModalOpen(false)}
-          imageUrl={imageResult.imageUrl}
+          imageUrl={activeUrl}
           initialPrompt={imageResult.prompt}
         />
       )}

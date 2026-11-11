@@ -49,10 +49,16 @@ export async function POST(req: NextRequest) {
       const filename = `pin_${i + 1}_${job.id.slice(-6)}.jpg`;
       try {
         if (job.imageUrl) {
-          const imgRes = await fetch(job.imageUrl);
-          if (imgRes.ok) {
-            const buffer = await imgRes.arrayBuffer();
+          if (job.imageUrl.startsWith('data:image')) {
+            const base64Data = job.imageUrl.split(',')[1];
+            const buffer = Buffer.from(base64Data, 'base64');
             imagesFolder?.file(filename, buffer);
+          } else {
+            const imgRes = await fetch(job.imageUrl);
+            if (imgRes.ok) {
+              const buffer = await imgRes.arrayBuffer();
+              imagesFolder?.file(filename, buffer);
+            }
           }
         }
       } catch (err) {

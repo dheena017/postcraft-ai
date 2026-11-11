@@ -16,6 +16,11 @@ const nextConfig = {
         destination: '/dashboard',
         permanent: true,
       },
+      {
+        source: '/sheets',
+        destination: '/studio?mode=sheets',
+        permanent: false,
+      },
     ];
   },
 };

@@ -66,6 +66,7 @@ export const LandingHeader: React.FC = () => {
             <span className="h-4 w-px bg-zinc-800" />
             <Link
               href="/dashboard"
+              prefetch={true}
               className="text-sm font-medium text-zinc-300 hover:text-white transition-colors flex items-center gap-1.5"
             >
               <LayoutDashboard className="w-3.5 h-3.5 text-brand-400" />
@@ -75,7 +76,7 @@ export const LandingHeader: React.FC = () => {
 
           {/* Right Action CTAs */}
           <div className="hidden sm:flex items-center gap-3">
-            <Link href="/dashboard">
+            <Link href="/dashboard" prefetch={true}>
               <Button
                 variant="secondary"
                 size="md"
@@ -84,7 +85,7 @@ export const LandingHeader: React.FC = () => {
                 Dashboard
               </Button>
             </Link>
-            <Link href="/studio">
+            <Link href="/studio" prefetch={true}>
               <Button
                 variant="primary"
                 size="md"
@@ -136,12 +137,12 @@ export const LandingHeader: React.FC = () => {
               <span>AI Creative Studio</span>
             </Link>
             <Link
-              href="/sheets"
+              href="/studio?mode=sheets"
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-zinc-300 hover:bg-zinc-900 hover:text-white"
             >
               <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
-              <span>Google Sheets Automation</span>
+              <span>Sheets Automation</span>
             </Link>
             <Link
               href="/queue"

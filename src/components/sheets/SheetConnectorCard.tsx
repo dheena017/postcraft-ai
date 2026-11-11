@@ -45,46 +45,47 @@ export const SheetConnectorCard: React.FC<SheetConnectorCardProps> = ({ onParse,
   };
 
   return (
-    <Card className="space-y-6">
+    <Card className="p-4 space-y-3.5">
       {/* Header with Sample Template Link */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-800">
+      <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-zinc-800">
         <div>
-          <h2 className="text-lg font-bold text-zinc-100 flex items-center gap-2">
-            <FileSpreadsheet className="w-5 h-5 text-brand-400" />
-            Connect Google Spreadsheet or CSV
-          </h2>
-          <p className="text-xs text-zinc-400 mt-0.5">
-            Bulk generate images from prompts and schedule multi-pin publishing campaigns.
+          <h3 className="text-xs font-bold text-zinc-100 flex items-center gap-1.5">
+            <FileSpreadsheet className="w-4 h-4 text-brand-400" />
+            Connect Google Sheet or CSV
+          </h3>
+          <p className="text-[10px] text-zinc-400 mt-0.5">
+            Batch schedule multi-pin publishing campaigns
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <Button
             size="sm"
             variant="outline"
             onClick={handleLoadSample}
-            leftIcon={<Sparkles className="w-3.5 h-3.5 text-amber-400" />}
+            leftIcon={<Sparkles className="w-3 h-3 text-amber-400" />}
+            className="text-[11px] py-1 px-2 h-auto"
           >
-            Load Demo Data
+            Demo Data
           </Button>
           <a
             href="/templates/sample-social-schedule.csv"
             download="sample-social-schedule.csv"
-            className="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-200 px-3 py-1.5 rounded-lg border border-zinc-800 bg-zinc-900/60 transition-colors"
+            className="inline-flex items-center gap-1 text-[11px] text-zinc-400 hover:text-zinc-200 px-2 py-1 rounded-lg border border-zinc-800 bg-zinc-900/60 transition-colors"
           >
-            <Download className="w-3.5 h-3.5" />
-            <span>Template CSV</span>
+            <Download className="w-3 h-3" />
+            <span>CSV</span>
           </a>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex rounded-xl bg-zinc-950 p-1 border border-zinc-800/80 max-w-sm">
+      <div className="flex rounded-lg bg-zinc-950 p-0.5 border border-zinc-800/80">
         <button
           type="button"
           onClick={() => setActiveTab('url')}
-          className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium transition-all ${
-            activeTab === 'url' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'
+          className={`flex-1 py-1 px-2 rounded-md text-[11px] font-medium transition-all cursor-pointer ${
+            activeTab === 'url' ? 'bg-zinc-800 text-white shadow-sm font-semibold' : 'text-zinc-400 hover:text-zinc-200'
           }`}
         >
           Google Sheet Link
@@ -92,8 +93,8 @@ export const SheetConnectorCard: React.FC<SheetConnectorCardProps> = ({ onParse,
         <button
           type="button"
           onClick={() => setActiveTab('upload')}
-          className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium transition-all ${
-            activeTab === 'upload' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'
+          className={`flex-1 py-1 px-2 rounded-md text-[11px] font-medium transition-all cursor-pointer ${
+            activeTab === 'upload' ? 'bg-zinc-800 text-white shadow-sm font-semibold' : 'text-zinc-400 hover:text-zinc-200'
           }`}
         >
           Upload CSV File
@@ -101,34 +102,32 @@ export const SheetConnectorCard: React.FC<SheetConnectorCardProps> = ({ onParse,
       </div>
 
       {activeTab === 'url' ? (
-        <form onSubmit={handleUrlSubmit} className="space-y-4">
+        <form onSubmit={handleUrlSubmit} className="space-y-2">
           <div>
-            <label className="text-xs font-semibold text-zinc-300">Google Spreadsheet URL</label>
-            <div className="mt-1 flex gap-2">
+            <div className="flex gap-2">
               <input
                 type="url"
                 required
                 value={sheetUrl}
                 onChange={(e) => setSheetUrl(e.target.value)}
-                placeholder="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit?usp=sharing"
-                className="flex-1 rounded-xl border border-zinc-700/80 bg-zinc-950 px-4 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:border-brand-500 focus:outline-none"
+                placeholder="https://docs.google.com/spreadsheets/d/.../edit"
+                className="flex-1 rounded-xl border border-zinc-700/80 bg-zinc-950 px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:border-brand-500 focus:outline-none"
               />
-              <Button type="submit" isLoading={isLoading} leftIcon={<LinkIcon className="w-4 h-4" />}>
-                Connect Sheet
+              <Button type="submit" size="sm" variant="primary" isLoading={isLoading} leftIcon={<LinkIcon className="w-3.5 h-3.5" />}>
+                Connect
               </Button>
             </div>
-            <p className="text-[11px] text-zinc-500 mt-2">
-              💡 Tip: Set your Google Sheet share permissions to <strong className="text-zinc-400">&quot;Anyone with the link can view&quot;</strong> for instant zero-friction synchronization.
+            <p className="text-[10px] text-zinc-500 mt-1">
+              💡 Share setting must be &quot;Anyone with the link can view&quot;.
             </p>
           </div>
         </form>
       ) : (
-        <div className="border-2 border-dashed border-zinc-700/80 hover:border-brand-500/60 rounded-2xl p-8 text-center transition-colors bg-zinc-950/40">
-          <Upload className="w-8 h-8 text-zinc-400 mx-auto mb-3" />
-          <p className="text-sm font-semibold text-zinc-200">Drag & drop your CSV spreadsheet here</p>
-          <p className="text-xs text-zinc-500 mt-1 mb-4">Columns: Prompt, Title, Description, Board, Link, Schedule_Time</p>
-          <label className="cursor-pointer">
-            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-white transition-colors border border-zinc-700">
+        <div className="border border-dashed border-zinc-800 hover:border-brand-500/60 rounded-xl p-4 text-center transition-colors bg-zinc-950/40">
+          <Upload className="w-5 h-5 text-zinc-400 mx-auto mb-1.5" />
+          <p className="text-xs font-semibold text-zinc-200">Drag & drop CSV spreadsheet here</p>
+          <label className="cursor-pointer inline-block mt-2">
+            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-[11px] font-medium bg-zinc-800 hover:bg-zinc-700 text-white transition-colors border border-zinc-700">
               Browse Files
             </span>
             <input type="file" accept=".csv" onChange={handleFileUpload} className="hidden" />

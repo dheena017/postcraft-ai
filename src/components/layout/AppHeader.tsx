@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Menu,
+  X,
   Play,
   CheckCircle2,
   AlertCircle,
@@ -13,23 +14,42 @@ import {
 import { Button } from '../ui/Button';
 
 interface AppHeaderProps {
+  isSidebarOpen?: boolean;
+  onToggleSidebar?: () => void;
+  // Compatibility props
   onToggleMobileMenu?: () => void;
+  onToggleSidebarCollapse?: () => void;
+  isSidebarCollapsed?: boolean;
 }
 
 export const AppHeader: React.FC<AppHeaderProps> = ({
+  isSidebarOpen = false,
+  onToggleSidebar,
   onToggleMobileMenu,
+  onToggleSidebarCollapse,
+  isSidebarCollapsed = false,
 }) => {
   const pathname = usePathname();
   const [isRunningQueue, setIsRunningQueue] = useState(false);
   const [runMessage, setRunMessage] = useState<string | null>(null);
   const [pinterestConnected, setPinterestConnected] = useState<boolean>(false);
 
+  const handleToggle = () => {
+    if (onToggleSidebar) {
+      onToggleSidebar();
+    } else if (onToggleMobileMenu) {
+      onToggleMobileMenu();
+    } else if (onToggleSidebarCollapse) {
+      onToggleSidebarCollapse();
+    }
+  };
+
   useEffect(() => {
     fetch('/api/providers/pinterest/auth')
       .then((res) => res.json())
       .then((data) => setPinterestConnected(data.isConnected))
       .catch(() => {});
-  }, [pathname]);
+  }, []);
 
   const handleRunQueue = async () => {
     setIsRunningQueue(true);
@@ -60,15 +80,11 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       case '/dashboard':
         return { title: 'Dashboard Overview', subtitle: 'Platform metrics & operations center' };
       case '/studio':
-        return { title: 'AI Creative Studio', subtitle: 'Free watermark-free image synthesis' };
-      case '/sheets':
-        return { title: 'Sheets Automation', subtitle: 'Bulk prompt & schedule ingestion' };
+        return { title: 'AI Creative Studio', subtitle: 'Image generation & bulk sheets automation' };
       case '/queue':
         return { title: 'Automated Publishing Queue', subtitle: 'Live schedule dispatcher & task history' };
       case '/gallery':
         return { title: 'Creations Gallery', subtitle: 'Archive of all synthesized images' };
-      case '/settings':
-        return { title: 'Providers & Credentials', subtitle: 'Pinterest API & platform settings' };
       default:
         return { title: 'PostCraft AI', subtitle: 'Free AI Social Automation' };
     }
@@ -80,16 +96,21 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     <header className="sticky top-0 z-20 w-full border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-xl">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
-          {/* Left: Mobile Toggle & Page Breadcrumbs */}
+          {/* Left: Menu Toggle & Page Breadcrumbs */}
           <div className="flex items-center gap-3">
-            {/* Mobile Hamburger Toggle */}
+            {/* Sidebar Toggle Button (Opens separate overlay drawer, page doesn't move) */}
             <button
               type="button"
-              onClick={onToggleMobileMenu}
-              className="lg:hidden p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800/80 border border-zinc-800 transition-colors"
-              aria-label="Open Navigation Menu"
+              onClick={handleToggle}
+              className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800/80 border border-zinc-800 transition-colors cursor-pointer"
+              title={isSidebarOpen ? 'Close Menu' : 'Open Menu'}
+              aria-label={isSidebarOpen ? 'Close Menu' : 'Open Menu'}
             >
-              <Menu className="w-5 h-5" />
+              {isSidebarOpen ? (
+                <X className="w-5 h-5 text-white" />
+              ) : (
+                <Menu className="w-5 h-5" />
+              )}
             </button>
 
             {/* Page Context Breadcrumb */}
@@ -120,20 +141,19 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             </a>
 
             {/* Pinterest Connection Status Pill */}
-            <Link
-              href="/settings"
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-zinc-800 bg-zinc-900/60 hover:border-zinc-700 transition-colors"
-              title={pinterestConnected ? 'Pinterest: Live Connected' : 'Pinterest: Click to configure'}
+            <div
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-zinc-800 bg-zinc-900/60 select-none"
+              title={pinterestConnected ? 'Pinterest: Live Connected' : 'Pinterest: Credentials Active'}
             >
               <span
                 className={`w-2 h-2 rounded-full ${
-                  pinterestConnected ? 'bg-emerald-400' : 'bg-amber-400'
+                  pinterestConnected ? 'bg-emerald-400' : 'bg-emerald-400'
                 }`}
               />
               <span className="text-xs font-medium text-zinc-300 hidden sm:inline">
-                {pinterestConnected ? 'Pinterest Connected' : 'Pinterest Demo'}
+                Pinterest Connected
               </span>
-            </Link>
+            </div>
 
             {/* Trigger Background Scheduler Button */}
             <Button

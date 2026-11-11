@@ -175,7 +175,7 @@ export default function LandingPage() {
                 Open Dashboard
               </Button>
             </Link>
-            <Link href="/sheets">
+            <Link href="/studio?mode=sheets">
               <Button
                 size="lg"
                 variant="outline"
@@ -398,7 +398,7 @@ export default function LandingPage() {
               Link any public Google Spreadsheet or CSV containing prompts, pin titles, boards, and scheduled times. PostCraft queues and dispatches them automatically.
             </p>
             <div className="pt-2">
-              <Link href="/sheets" className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 flex items-center gap-1">
+              <Link href="/studio?mode=sheets" className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 flex items-center gap-1">
                 Connect Sheets &rarr;
               </Link>
             </div>
@@ -413,8 +413,8 @@ export default function LandingPage() {
               Native Pinterest API v5 integration with official board publishing, backed by an extensible architecture ready for Instagram, Twitter, and TikTok.
             </p>
             <div className="pt-2">
-              <Link href="/settings" className="text-xs font-semibold text-purple-400 hover:text-purple-300 flex items-center gap-1">
-                Configure Credentials &rarr;
+              <Link href="/dashboard" className="text-xs font-semibold text-purple-400 hover:text-purple-300 flex items-center gap-1">
+                View In Dashboard &rarr;
               </Link>
             </div>
           </Card>

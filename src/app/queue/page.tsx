@@ -170,7 +170,7 @@ export default function QueuePage() {
             placeholder="Search prompt, title, or board..."
             className="w-full sm:w-64 rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-500 focus:border-brand-500 focus:outline-none"
           />
-          <Link href="/sheets">
+          <Link href="/studio?mode=sheets">
             <Button size="sm" variant="secondary" leftIcon={<Plus className="w-3.5 h-3.5" />}>
               Import More
             </Button>
@@ -189,7 +189,7 @@ export default function QueuePage() {
             <p className="text-xs text-zinc-500 max-w-sm mx-auto">
               Import a Google Sheet or use the AI Studio to schedule automated pins to Pinterest.
             </p>
-            <Link href="/sheets" className="inline-block pt-2">
+            <Link href="/studio?mode=sheets" className="inline-block pt-2">
               <Button size="sm" variant="primary">
                 Import from Google Sheets
               </Button>

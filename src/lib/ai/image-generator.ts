@@ -24,12 +24,12 @@ export async function generateAiImage(request: ImageGenerationRequest): Promise<
     ? `${antiWatermarkNegative}, ${negativePrompt}` 
     : antiWatermarkNegative;
 
-  // Construct Pollinations.ai URL with explicit nologo=true (strictly eliminates watermarks)
-  // We use the FLUX model for cutting-edge photorealism & aesthetics
+  // Generate with a +42px bottom padding to isolate the provider watermark,
+  // allowing our engine to cleanly trim it off with zero loss of the artwork's native dimensions.
   const encodedPrompt = encodeURIComponent(enhanced);
   const encodedNegative = encodeURIComponent(finalNegative);
-
-  const directImageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true&model=flux&negative=${encodedNegative}`;
+  const generationHeight = height + 42;
+  const directImageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${generationHeight}&seed=${seed}&nologo=true&model=flux&negative=${encodedNegative}`;
 
   return {
     imageUrl: directImageUrl,

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { ImageGenerationResult } from '@/types/image';
 import { Download, Share2, Sparkles, Image as ImageIcon } from 'lucide-react';
 import { QuickPublishModal } from '@/components/studio/QuickPublishModal';
+import { removeWatermark } from '@/lib/ai/clean-image';
 import Link from 'next/link';
 
 export default function GalleryPage() {
@@ -25,7 +26,18 @@ export default function GalleryPage() {
 
   const handleDownload = async (img: ImageGenerationResult) => {
     try {
-      const response = await fetch(img.imageUrl);
+      const cleanUrl = await removeWatermark(img.imageUrl, img.width, img.height);
+      if (cleanUrl.startsWith('data:')) {
+        const a = document.createElement('a');
+        a.href = cleanUrl;
+        a.download = `postcraft_${img.seed}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        return;
+      }
+
+      const response = await fetch(cleanUrl);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');

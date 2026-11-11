@@ -31,67 +31,67 @@ export const BrandLogoMark: React.FC<{ size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'; 
     <div
       className={`relative ${cfg.box} rounded-xl group-hover:scale-105 transition-all duration-300 flex-shrink-0 select-none ${className}`}
     >
-      {/* Outer Dynamic Radial Ambient Glow */}
-      <div className="absolute -inset-1 rounded-2xl bg-gradient-to-tr from-brand-600 via-rose-500 to-amber-500 opacity-30 blur-md group-hover:opacity-60 transition-opacity duration-300 -z-10" />
+      {/* Outer Subtle Ambient Glow - Refined, tight & restrained */}
+      <div className="absolute -inset-0.5 rounded-xl bg-gradient-to-tr from-rose-500/35 via-pink-500/25 to-amber-500/25 blur-[2px] opacity-50 group-hover:opacity-75 transition-opacity duration-300 pointer-events-none" />
 
       {/* High-Definition Vector SVG Glyph */}
       <svg
         viewBox="0 0 48 48"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="w-full h-full drop-shadow-md"
+        className="w-full h-full drop-shadow-sm"
       >
         <defs>
           <linearGradient id="markBorderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#ff1a53" />
-            <stop offset="45%" stop-color="#f43f5e" />
-            <stop offset="85%" stop-color="#fb923c" />
-            <stop offset="100%" stop-color="#f59e0b" />
+            <stop offset="0%" stopColor="#ff2a6d" />
+            <stop offset="45%" stopColor="#f43f5e" />
+            <stop offset="85%" stopColor="#fb923c" />
+            <stop offset="100%" stopColor="#f59e0b" />
           </linearGradient>
 
           <radialGradient id="markGlassGrad" cx="30%" cy="20%" r="90%">
-            <stop offset="0%" stop-color="#1c1917" stop-opacity="0.95" />
-            <stop offset="60%" stop-color="#0c0a09" stop-opacity="0.98" />
-            <stop offset="100%" stop-color="#000000" stop-opacity="1" />
+            <stop offset="0%" stopColor="#27272a" />
+            <stop offset="60%" stopColor="#18181b" />
+            <stop offset="100%" stopColor="#111113" />
           </radialGradient>
 
           <linearGradient id="markStemGrad" x1="10%" y1="0%" x2="90%" y2="100%">
-            <stop offset="0%" stop-color="#ffffff" />
-            <stop offset="25%" stop-color="#ffe4e6" />
-            <stop offset="60%" stop-color="#f43f5e" />
-            <stop offset="100%" stop-color="#be123c" />
+            <stop offset="0%" stopColor="#ffffff" />
+            <stop offset="35%" stopColor="#ffe4e6" />
+            <stop offset="70%" stopColor="#f43f5e" />
+            <stop offset="100%" stopColor="#e11d48" />
           </linearGradient>
 
           <linearGradient id="markLoopGrad" x1="0%" y1="10%" x2="100%" y2="90%">
-            <stop offset="0%" stop-color="#ff4365" />
-            <stop offset="40%" stop-color="#f43f5e" />
-            <stop offset="80%" stop-color="#fb923c" />
-            <stop offset="100%" stop-color="#f59e0b" />
+            <stop offset="0%" stopColor="#ff4365" />
+            <stop offset="40%" stopColor="#f43f5e" />
+            <stop offset="80%" stopColor="#fb923c" />
+            <stop offset="100%" stopColor="#f59e0b" />
           </linearGradient>
 
           <linearGradient id="markSparkleCore" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#ffffff" />
-            <stop offset="50%" stop-color="#fef08a" />
-            <stop offset="100%" stop-color="#f59e0b" />
+            <stop offset="0%" stopColor="#ffffff" />
+            <stop offset="50%" stopColor="#fef08a" />
+            <stop offset="100%" stopColor="#f59e0b" />
           </linearGradient>
 
-          <filter id="markNeonGlow" x="-30%" y="-30%" width="160%" height="160%">
-            <feDropShadow dx="0" dy="1.5" stdDeviation="2.5" flood-color="#f43f5e" flood-opacity="0.5" />
+          <filter id="markNeonGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="1" stdDeviation="1.5" floodColor="#f43f5e" floodOpacity="0.4" />
           </filter>
-          <filter id="markStarGlow" x="-40%" y="-40%" width="180%" height="180%">
-            <feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#fbbf24" flood-opacity="0.8" />
+          <filter id="markStarGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="0" stdDeviation="1" floodColor="#fbbf24" floodOpacity="0.6" />
           </filter>
         </defs>
 
-        {/* Deep Obsidian Rounded Base with Glass Shimmer */}
-        <rect x="2.5" y="2.5" width="43" height="43" rx="12" fill="url(#markGlassGrad)" />
-        <rect x="2.5" y="2.5" width="43" height="43" rx="12" stroke="url(#markBorderGrad)" stroke-width="1.8" />
+        {/* Visible Glass Rounded Base */}
+        <rect x="2" y="2" width="44" height="44" rx="12" fill="url(#markGlassGrad)" />
+        <rect x="2" y="2" width="44" height="44" rx="12" stroke="url(#markBorderGrad)" strokeWidth="1.6" />
 
         {/* Specular Glint Highlight */}
         <path
           d="M4 14C4 8.47715 8.47715 4 14 4H34C37 4 39.5 5.2 41.3 7.2C38.5 6.2 34 5.8 28 6.5C18 7.6 10 13 6.5 21C5.2 19 4 16.5 4 14Z"
           fill="white"
-          fill-opacity="0.09"
+          fillOpacity="0.12"
         />
 
         {/* Dimensional Craft "P" Monogram */}
@@ -108,7 +108,7 @@ export const BrandLogoMark: React.FC<{ size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'; 
 
           <path
             d="M20.5 15.5H26C28.7614 15.5 31 17.7386 31 20.5C31 23.2614 28.7614 25.5 26 25.5H20.5V15.5Z"
-            fill="#0c0a09"
+            fill="#18181b"
           />
         </g>
 
@@ -119,7 +119,7 @@ export const BrandLogoMark: React.FC<{ size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'; 
           filter="url(#markStarGlow)"
         />
 
-        <circle cx="25.5" cy="20.5" r="0.9" fill="#ffffff" />
+        <circle cx="25.5" cy="20.5" r="1.1" fill="#ffffff" />
 
         {/* Accent Creative Sparkle */}
         <path

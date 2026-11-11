@@ -167,7 +167,7 @@ export default function PrivacyPolicyPage() {
             We may periodically update this Privacy Policy to reflect platform enhancements or changes in third-party API terms. Revisions will be reflected with an updated date at the top of this document.
           </p>
           <p className="text-xs text-zinc-400">
-            If you have questions regarding this policy, security inquiries, or API compliance details, please visit our <Link href="/settings" className="text-brand-400 hover:underline">Providers &amp; Settings</Link> page or review our official GitHub repository documentation.
+            If you have questions regarding this policy, security inquiries, or API compliance details, please review our official documentation or open an issue on our repository.
           </p>
         </div>
       ),

@@ -14,43 +14,23 @@ interface DashboardShellProps {
 export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
   const pathname = usePathname();
   const isPublicPage = pathname === '/' || pathname === '/privacy' || pathname === '/terms';
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const isStudioPage = pathname === '/studio';
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Load saved sidebar collapse preference
+  // When changing pages: reset scroll and close sidebar automatically
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('postcraft_sidebar_collapsed');
-      if (saved !== null) {
-        setIsSidebarCollapsed(saved === 'true');
-      }
-    } catch {}
-  }, []);
-
-  // When changing pages: reset scroll and close mobile menu automatically
-  useEffect(() => {
-    setIsMobileMenuOpen(false);
+    setIsSidebarOpen(false);
     try {
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     } catch {}
   }, [pathname]);
 
-  const handleToggleSidebarCollapse = () => {
-    setIsSidebarCollapsed((prev) => {
-      const next = !prev;
-      try {
-        localStorage.setItem('postcraft_sidebar_collapsed', String(next));
-      } catch {}
-      return next;
-    });
-  };
-
-  // Public Pages (/, /privacy, /terms): Full-Width Layout with smooth page transition
+  // Public Pages (/, /privacy, /terms): Full-Width Layout
   if (isPublicPage) {
     return (
       <div className="min-h-screen bg-zinc-950 flex flex-col antialiased">
         <LandingHeader />
-        <main key={pathname} className="page-transition flex-1 w-full">
+        <main className="flex-1 w-full">
           {children}
         </main>
         <AppFooter />
@@ -58,24 +38,23 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
     );
   }
 
-  // Inside the App: Dashboard Layout with In-Sidebar Controls & smooth page transitions
+  // Inside the App: Separate Overlay Sidebar Drawer - page content underneath NEVER moves or shifts!
   return (
-    <div className="min-h-screen bg-zinc-950 flex flex-row antialiased">
-      {/* App Sidebar */}
+    <div className="relative w-full h-screen bg-zinc-950 flex flex-col antialiased overflow-hidden">
+      {/* Floating Separate Overlay Drawer */}
       <AppSidebar
-        isCollapsed={isSidebarCollapsed}
-        onToggleCollapse={handleToggleSidebarCollapse}
-        isOpenMobile={isMobileMenuOpen}
-        onCloseMobile={() => setIsMobileMenuOpen(false)}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
       />
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 transition-all duration-300">
+      {/* Main Content Area: 100% full width, completely stationary */}
+      <div className="w-full flex-1 flex flex-col min-w-0 h-full overflow-hidden">
         <AppHeader
-          onToggleMobileMenu={() => setIsMobileMenuOpen(true)}
+          isSidebarOpen={isSidebarOpen}
+          onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
         />
-        {/* Animated Page Transition Container */}
-        <main key={pathname} className="page-transition flex-1">
+        {/* Instant Page Container */}
+        <main className={`flex-1 w-full flex flex-col min-h-0 ${isStudioPage ? 'overflow-hidden' : 'overflow-y-auto'}`}>
           {children}
         </main>
       </div>

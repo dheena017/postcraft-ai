@@ -18,26 +18,20 @@ export const AppFooter: React.FC = () => {
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-6">
-          <Link href="/dashboard" className="hover:text-zinc-300 transition-colors flex items-center gap-1">
+          <Link href="/dashboard" prefetch={true} className="hover:text-zinc-300 transition-colors flex items-center gap-1">
             <LayoutDashboard className="w-3.5 h-3.5 text-brand-400" />
             <span>Dashboard</span>
           </Link>
-          <Link href="/studio" className="hover:text-zinc-300 transition-colors">
-            AI Studio
+          <Link href="/studio" prefetch={true} className="hover:text-zinc-300 transition-colors">
+            AI Studio &amp; Sheets
           </Link>
-          <Link href="/sheets" className="hover:text-zinc-300 transition-colors">
-            Google Sheets
-          </Link>
-          <Link href="/queue" className="hover:text-zinc-300 transition-colors">
+          <Link href="/queue" prefetch={true} className="hover:text-zinc-300 transition-colors">
             Queue Scheduler
           </Link>
-          <Link href="/gallery" className="hover:text-zinc-300 transition-colors">
+          <Link href="/gallery" prefetch={true} className="hover:text-zinc-300 transition-colors">
             Creations Gallery
           </Link>
-          <Link href="/settings" className="hover:text-zinc-300 transition-colors">
-            Providers &amp; Settings
-          </Link>
-          <Link href="/privacy" className="hover:text-zinc-300 transition-colors">
+          <Link href="/privacy" prefetch={true} className="hover:text-zinc-300 transition-colors">
             Privacy Policy
           </Link>
         </div>
