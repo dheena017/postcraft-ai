@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <defs>
+    <linearGradient id="iconBorderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff1a53" />
+      <stop offset="45%" stop-color="#f43f5e" />
+      <stop offset="85%" stop-color="#fb923c" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+
+    <radialGradient id="iconGlassGrad" cx="30%" cy="20%" r="90%">
+      <stop offset="0%" stop-color="#1c1917" stop-opacity="0.9" />
+      <stop offset="60%" stop-color="#0c0a09" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="1" />
+    </radialGradient>
+
+    <linearGradient id="iconStemGrad" x1="10%" y1="0%" x2="90%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="25%" stop-color="#ffe4e6" />
+      <stop offset="60%" stop-color="#f43f5e" />
+      <stop offset="100%" stop-color="#be123c" />
+    </linearGradient>
+
+    <linearGradient id="iconLoopGrad" x1="0%" y1="10%" x2="100%" y2="90%">
+      <stop offset="0%" stop-color="#ff4365" />
+      <stop offset="40%" stop-color="#f43f5e" />
+      <stop offset="80%" stop-color="#fb923c" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+
+    <linearGradient id="iconSparkleCore" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="50%" stop-color="#fef08a" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+
+    <filter id="iconNeonGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#f43f5e" flood-opacity="0.5" />
+    </filter>
+    <filter id="iconStarGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="#fbbf24" flood-opacity="0.8" />
+    </filter>
+  </defs>
+
+  <!-- Deep Obsidian Rounded Base with Glass Shimmer -->
+  <rect x="2.5" y="2.5" width="43" height="43" rx="12" fill="url(#iconGlassGrad)" />
+  <rect x="2.5" y="2.5" width="43" height="43" rx="12" stroke="url(#iconBorderGrad)" stroke-width="1.8" />
+
+  <!-- Top-left subtle specular light sheen -->
+  <path
+    d="M4 14C4 8.47715 8.47715 4 14 4H34C37 4 39.5 5.2 41.3 7.2C38.5 6.2 34 5.8 28 6.5C18 7.6 10 13 6.5 21C5.2 19 4 16.5 4 14Z"
+    fill="white"
+    fill-opacity="0.08"
+  />
+
+  <!-- Main Monogram: Dimensional Craft "P" with Pin Tip -->
+  <g filter="url(#iconNeonGlow)">
+    <path
+      d="M20 9.5H26.5C32.8513 9.5 38 14.4249 38 20.5C38 26.5751 32.8513 31.5 26.5 31.5H20V9.5Z"
+      fill="url(#iconLoopGrad)"
+    />
+
+    <path
+      d="M11.5 11.5C11.5 10.3954 12.3954 9.5 13.5 9.5H20.5V31.5H16.8C16.1 31.5 15.4 31.9 15 32.5L11.8 37.3C11.4 37.9 11.5 36.8 11.5 36.2V11.5Z"
+      fill="url(#iconStemGrad)"
+    />
+
+    <path
+      d="M20.5 15.5H26C28.7614 15.5 31 17.7386 31 20.5C31 23.2614 28.7614 25.5 26 25.5H20.5V15.5Z"
+      fill="#0c0a09"
+    />
+  </g>
+
+  <!-- Radiant Generative AI Spark (✦) -->
+  <path
+    d="M25.5 16C25.5 18.2 26.8 19.5 29 20.5C26.8 21.5 25.5 22.8 25.5 25C25.5 22.8 24.2 21.5 22 20.5C24.2 19.5 25.5 18.2 25.5 16Z"
+    fill="url(#iconSparkleCore)"
+    filter="url(#iconStarGlow)"
+  />
+
+  <circle cx="25.5" cy="20.5" r="0.9" fill="#ffffff" />
+
+  <!-- Accent Creative Sparkle on Top-Right -->
+  <path
+    d="M37.5 7C37.5 8.3 38.4 9.2 39.7 9.2C38.4 9.2 37.5 10.1 37.5 11.4C37.5 10.1 36.6 9.2 35.3 9.2C36.6 9.2 37.5 8.3 37.5 7Z"
+    fill="#fef08a"
+    filter="url(#iconStarGlow)"
+  />
+</svg>

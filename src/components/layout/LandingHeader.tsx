@@ -14,6 +14,7 @@ import {
   Grid,
 } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { BrandLogo } from '../ui/BrandLogo';
 
 export const LandingHeader: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -23,27 +24,11 @@ export const LandingHeader: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Brand Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-rose-500 to-amber-500 p-0.5 shadow-lg shadow-brand-500/25 group-hover:scale-105 transition-transform duration-200">
-              <div className="w-full h-full bg-zinc-950 rounded-[10px] flex items-center justify-center">
-                <span className="font-black text-transparent bg-clip-text bg-gradient-to-tr from-brand-400 to-rose-300 text-lg">
-                  P
-                </span>
-              </div>
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-bold text-lg text-white tracking-tight">
-                  PostCraft
-                </span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded-md font-bold bg-brand-500/20 text-brand-300 border border-brand-500/30">
-                  AI
-                </span>
-              </div>
-              <p className="text-[11px] text-zinc-500 font-medium">
-                Free AI Image Studio &amp; Social Publisher
-              </p>
-            </div>
+          <Link href="/" className="focus:outline-none" title="PostCraft AI Home">
+            <BrandLogo
+              size="md"
+              subtitle="Free AI Image Studio &amp; Social Publisher"
+            />
           </Link>
 
           {/* Center Navigation Links (Desktop) */}

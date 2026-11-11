@@ -9,21 +9,14 @@ import {
   CheckCircle2,
   AlertCircle,
   FileSpreadsheet,
-  PanelLeftClose,
-  PanelLeftOpen,
-  PanelLeft,
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 
 interface AppHeaderProps {
-  isSidebarCollapsed?: boolean;
-  onToggleSidebarCollapse?: () => void;
   onToggleMobileMenu?: () => void;
 }
 
 export const AppHeader: React.FC<AppHeaderProps> = ({
-  isSidebarCollapsed = false,
-  onToggleSidebarCollapse,
   onToggleMobileMenu,
 }) => {
   const pathname = usePathname();
@@ -87,22 +80,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     <header className="sticky top-0 z-20 w-full border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-xl">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
-          {/* Left: Sidebar Toggle Button & Page Breadcrumbs */}
+          {/* Left: Mobile Toggle & Page Breadcrumbs */}
           <div className="flex items-center gap-3">
-            {/* Desktop Collapse/Expand Sidebar Toggle */}
-            <button
-              type="button"
-              onClick={onToggleSidebarCollapse}
-              className="hidden lg:flex items-center justify-center p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-900 border border-zinc-800 transition-colors"
-              title={isSidebarCollapsed ? 'Open / Expand Sidebar' : 'Close / Collapse Sidebar'}
-            >
-              {isSidebarCollapsed ? (
-                <PanelLeftOpen className="w-5 h-5 text-brand-400" />
-              ) : (
-                <PanelLeftClose className="w-5 h-5 text-zinc-400" />
-              )}
-            </button>
-
             {/* Mobile Hamburger Toggle */}
             <button
               type="button"
@@ -140,42 +119,49 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
               <span>CSV Template</span>
             </a>
 
-            {/* Pinterest Connection Status Indicator */}
+            {/* Pinterest Connection Status Pill */}
             <Link
               href="/settings"
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition-colors ${
-                pinterestConnected
-                  ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/20'
-                  : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:border-zinc-700 hover:text-zinc-200'
-              }`}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-zinc-800 bg-zinc-900/60 hover:border-zinc-700 transition-colors"
+              title={pinterestConnected ? 'Pinterest: Live Connected' : 'Pinterest: Click to configure'}
             >
-              {pinterestConnected ? (
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-              ) : (
-                <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
-              )}
-              <span className="hidden sm:inline font-semibold">Pinterest:</span>
-              <span>{pinterestConnected ? 'Active' : 'Demo Mode'}</span>
+              <span
+                className={`w-2 h-2 rounded-full ${
+                  pinterestConnected ? 'bg-emerald-400' : 'bg-amber-400'
+                }`}
+              />
+              <span className="text-xs font-medium text-zinc-300 hidden sm:inline">
+                {pinterestConnected ? 'Pinterest Connected' : 'Pinterest Demo'}
+              </span>
             </Link>
 
-            {/* Run Scheduler Now Button */}
+            {/* Trigger Background Scheduler Button */}
             <Button
+              variant="secondary"
               size="sm"
-              variant="primary"
-              onClick={handleRunQueue}
               isLoading={isRunningQueue}
-              leftIcon={<Play className="w-3.5 h-3.5 fill-current" />}
+              onClick={handleRunQueue}
+              leftIcon={<Play className="w-3.5 h-3.5 text-brand-400" />}
+              title="Manually trigger scheduler to process due jobs"
             >
-              <span className="hidden sm:inline">Run Scheduler Now</span>
-              <span className="sm:hidden">Run</span>
+              <span className="hidden sm:inline">Run Queue</span>
             </Button>
           </div>
         </div>
 
-        {/* Ephemeral Feedback Toast Bar */}
+        {/* Banner Notification for queue trigger */}
         {runMessage && (
-          <div className="bg-brand-500/15 border-t border-brand-500/30 text-xs text-brand-200 py-1.5 px-4 text-center animate-in fade-in">
-            ⚡ {runMessage}
+          <div className="py-2 px-3 my-2 text-xs rounded-xl bg-brand-500/10 border border-brand-500/20 text-brand-300 flex items-center justify-between animate-in fade-in">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <span>{runMessage}</span>
+            </div>
+            <button
+              onClick={() => setRunMessage(null)}
+              className="text-zinc-400 hover:text-white text-[11px]"
+            >
+              Dismiss
+            </button>
           </div>
         )}
       </div>

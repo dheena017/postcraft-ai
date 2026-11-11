@@ -6,6 +6,11 @@ export const metadata: Metadata = {
   title: 'PostCraft AI | Free AI Image Studio & Social Publisher',
   description:
     'Free, unlimited, watermark-free AI image generation with automated scheduling and Pinterest publishing from prompts and Google Sheets.',
+  icons: {
+    icon: '/icon.svg',
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
 };
 
 export default function RootLayout({

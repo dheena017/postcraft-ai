@@ -13,12 +13,11 @@ interface DashboardShellProps {
 
 export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
   const pathname = usePathname();
-  const isLandingPage = pathname === '/';
-
+  const isPublicPage = pathname === '/' || pathname === '/privacy' || pathname === '/terms';
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
-  // Load saved sidebar preference
+  // Load saved sidebar collapse preference
   useEffect(() => {
     try {
       const saved = localStorage.getItem('postcraft_sidebar_collapsed');
@@ -27,6 +26,14 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
       }
     } catch {}
   }, []);
+
+  // When changing pages: reset scroll and close mobile menu automatically
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+    try {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    } catch {}
+  }, [pathname]);
 
   const handleToggleSidebarCollapse = () => {
     setIsSidebarCollapsed((prev) => {
@@ -38,21 +45,23 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
     });
   };
 
-  // If on the Public Landing Page (/): Full-Width Layout WITHOUT Sidebar
-  if (isLandingPage) {
+  // Public Pages (/, /privacy, /terms): Full-Width Layout with smooth page transition
+  if (isPublicPage) {
     return (
       <div className="min-h-screen bg-zinc-950 flex flex-col antialiased">
         <LandingHeader />
-        <main className="flex-1 w-full">{children}</main>
+        <main key={pathname} className="page-transition flex-1 w-full">
+          {children}
+        </main>
         <AppFooter />
       </div>
     );
   }
 
-  // If inside the App (/studio, /sheets, /queue, /gallery, /settings): Dashboard Layout WITH Sidebar
+  // Inside the App: Dashboard Layout with In-Sidebar Controls & smooth page transitions
   return (
     <div className="min-h-screen bg-zinc-950 flex flex-row antialiased">
-      {/* Collapsible App Sidebar */}
+      {/* App Sidebar */}
       <AppSidebar
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={handleToggleSidebarCollapse}
@@ -63,12 +72,12 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 transition-all duration-300">
         <AppHeader
-          isSidebarCollapsed={isSidebarCollapsed}
-          onToggleSidebarCollapse={handleToggleSidebarCollapse}
           onToggleMobileMenu={() => setIsMobileMenuOpen(true)}
         />
-        <main className="flex-1">{children}</main>
-        <AppFooter />
+        {/* Animated Page Transition Container */}
+        <main key={pathname} className="page-transition flex-1">
+          {children}
+        </main>
       </div>
     </div>
   );
