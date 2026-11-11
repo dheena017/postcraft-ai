@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { BrandLogoMark } from '@/components/ui/BrandLogo';
 import {
   Menu,
@@ -30,7 +29,6 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   onToggleSidebarCollapse,
   isSidebarCollapsed = false,
 }) => {
-  const pathname = usePathname();
   const [isRunningQueue, setIsRunningQueue] = useState(false);
   const [runMessage, setRunMessage] = useState<string | null>(null);
   const [pinterestConnected, setPinterestConnected] = useState<boolean>(false);
@@ -75,29 +73,11 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     }
   };
 
-  const getPageTitle = () => {
-    switch (pathname) {
-      case '/':
-      case '/dashboard':
-        return { title: 'Dashboard Overview', subtitle: 'Platform metrics & operations center' };
-      case '/studio':
-        return { title: 'AI Creative Studio', subtitle: 'Image generation & bulk sheets automation' };
-      case '/queue':
-        return { title: 'Automated Publishing Queue', subtitle: 'Live schedule dispatcher & task history' };
-      case '/gallery':
-        return { title: 'Creations Gallery', subtitle: 'Archive of all synthesized images' };
-      default:
-        return { title: 'PostCraft AI', subtitle: 'Free AI Social Automation' };
-    }
-  };
-
-  const pageInfo = getPageTitle();
-
   return (
     <header className="sticky top-0 z-20 w-full border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-xl">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
-          {/* Left: Menu Toggle, Brand Logo & Page Breadcrumbs */}
+          {/* Left: Menu Toggle & Brand Logo */}
           <div className="flex items-center gap-3">
             {/* Sidebar Toggle Button (Opens separate overlay drawer, page doesn't move) */}
             <button
@@ -114,37 +94,25 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
               )}
             </button>
 
-            {/* Brand Logo */}
+            {/* Brand Logo & Name */}
             <Link
               href="/dashboard"
-              className="flex items-center gap-2 focus:outline-none group flex-shrink-0"
+              className="flex items-center gap-2.5 focus:outline-none group select-none flex-shrink-0"
               title="PostCraft AI Dashboard"
             >
               <BrandLogoMark size="sm" />
-              <div className="hidden xl:flex items-center gap-1.5 leading-none">
-                <span className="font-extrabold text-sm tracking-tight text-white group-hover:text-zinc-200 transition-colors">
-                  PostCraft
+              <div className="flex items-center gap-1.5 leading-none">
+                <span className="font-extrabold text-base tracking-tight text-white group-hover:text-zinc-200 transition-colors">
+                  <span className="text-white">Post</span>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 via-pink-300 to-amber-300">
+                    Craft
+                  </span>
                 </span>
-                <span className="rounded font-bold text-[9px] px-1 py-0.2 bg-brand-500/20 text-brand-300 border border-brand-500/35">
+                <span className="rounded-md font-extrabold text-[9px] px-1.5 py-0.5 bg-gradient-to-r from-brand-500/20 via-rose-500/20 to-amber-500/20 text-brand-300 border border-brand-500/35">
                   AI
                 </span>
               </div>
             </Link>
-
-            <span className="hidden sm:block w-px h-5 bg-zinc-800 flex-shrink-0" />
-
-            {/* Page Context Breadcrumb */}
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <h1 className="text-sm sm:text-base font-bold text-white tracking-tight truncate">
-                  {pageInfo.title}
-                </h1>
-                <span className="hidden sm:inline-block w-1.5 h-1.5 rounded-full bg-zinc-700 flex-shrink-0" />
-                <span className="hidden sm:inline-block text-xs text-zinc-400 font-medium truncate">
-                  {pageInfo.subtitle}
-                </span>
-              </div>
-            </div>
           </div>
 
           {/* Right: Quick Action Controls */}
