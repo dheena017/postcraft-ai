@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { BrandLogoMark } from '@/components/ui/BrandLogo';
 import {
   Menu,
   X,
@@ -96,13 +97,13 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     <header className="sticky top-0 z-20 w-full border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-xl">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
-          {/* Left: Menu Toggle & Page Breadcrumbs */}
+          {/* Left: Menu Toggle, Brand Logo & Page Breadcrumbs */}
           <div className="flex items-center gap-3">
             {/* Sidebar Toggle Button (Opens separate overlay drawer, page doesn't move) */}
             <button
               type="button"
               onClick={handleToggle}
-              className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800/80 border border-zinc-800 transition-colors cursor-pointer"
+              className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800/80 border border-zinc-800 transition-colors cursor-pointer flex-shrink-0"
               title={isSidebarOpen ? 'Close Menu' : 'Open Menu'}
               aria-label={isSidebarOpen ? 'Close Menu' : 'Open Menu'}
             >
@@ -113,14 +114,33 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
               )}
             </button>
 
+            {/* Brand Logo */}
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-2 focus:outline-none group flex-shrink-0"
+              title="PostCraft AI Dashboard"
+            >
+              <BrandLogoMark size="sm" />
+              <div className="hidden xl:flex items-center gap-1.5 leading-none">
+                <span className="font-extrabold text-sm tracking-tight text-white group-hover:text-zinc-200 transition-colors">
+                  PostCraft
+                </span>
+                <span className="rounded font-bold text-[9px] px-1 py-0.2 bg-brand-500/20 text-brand-300 border border-brand-500/35">
+                  AI
+                </span>
+              </div>
+            </Link>
+
+            <span className="hidden sm:block w-px h-5 bg-zinc-800 flex-shrink-0" />
+
             {/* Page Context Breadcrumb */}
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h1 className="text-sm sm:text-base font-bold text-white tracking-tight">
+                <h1 className="text-sm sm:text-base font-bold text-white tracking-tight truncate">
                   {pageInfo.title}
                 </h1>
-                <span className="hidden sm:inline-block w-1.5 h-1.5 rounded-full bg-zinc-700" />
-                <span className="hidden sm:inline-block text-xs text-zinc-400 font-medium">
+                <span className="hidden sm:inline-block w-1.5 h-1.5 rounded-full bg-zinc-700 flex-shrink-0" />
+                <span className="hidden sm:inline-block text-xs text-zinc-400 font-medium truncate">
                   {pageInfo.subtitle}
                 </span>
               </div>

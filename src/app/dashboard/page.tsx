@@ -43,6 +43,7 @@ export default function DashboardPage() {
   const [isPinterestConnected, setIsPinterestConnected] = useState<boolean>(false);
   const [providerStatuses, setProviderStatuses] = useState<ProviderStatus[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [queueTab, setQueueTab] = useState<'UPCOMING' | 'RECENT_PUBLISHED'>('UPCOMING');
 
   // Scheduler Runner State
   const [isRunningScheduler, setIsRunningScheduler] = useState(false);

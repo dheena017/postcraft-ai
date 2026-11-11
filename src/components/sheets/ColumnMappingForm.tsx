@@ -1,9 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Card } from '../ui/Card';
 import { SheetMappingConfig } from '@/types/job';
-import { Settings2 } from 'lucide-react';
+import { Settings2, ChevronDown } from 'lucide-react';
 
 interface ColumnMappingFormProps {
   headers: string[];
@@ -24,43 +23,53 @@ export const ColumnMappingForm: React.FC<ColumnMappingFormProps> = ({
   };
 
   const fields: Array<{ key: keyof SheetMappingConfig; label: string; required?: boolean }> = [
-    { key: 'promptCol', label: 'Image Prompt Column', required: true },
-    { key: 'titleCol', label: 'Pin Title Column', required: true },
-    { key: 'descriptionCol', label: 'Pin Description Column' },
-    { key: 'boardCol', label: 'Target Board Column' },
-    { key: 'linkCol', label: 'Destination URL Column' },
-    { key: 'scheduleTimeCol', label: 'Scheduled Time Column' },
+    { key: 'promptCol', label: 'Image Prompt', required: true },
+    { key: 'titleCol', label: 'Pin Title', required: true },
+    { key: 'boardCol', label: 'Target Board' },
+    { key: 'scheduleTimeCol', label: 'Scheduled Time' },
+    { key: 'descriptionCol', label: 'Pin Description' },
+    { key: 'linkCol', label: 'Destination URL' },
   ];
 
   return (
-    <Card className="space-y-4">
-      <div className="flex items-center gap-2 pb-3 border-b border-zinc-800">
-        <Settings2 className="w-4 h-4 text-brand-400" />
-        <h3 className="text-sm font-semibold text-zinc-200">Spreadsheet Column Mapping</h3>
+    <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/60 p-3 space-y-2.5">
+      <div className="flex items-center justify-between pb-1.5 border-b border-zinc-800/80">
+        <div className="flex items-center gap-1.5">
+          <Settings2 className="w-3.5 h-3.5 text-brand-400" />
+          <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-200">
+            Column Mapping
+          </h3>
+        </div>
+        <span className="text-[9px] px-1.5 py-0.2 rounded font-bold bg-brand-500/10 text-brand-400 border border-brand-500/25">
+          Auto-Mapped
+        </span>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-2">
         {fields.map(({ key, label, required }) => (
-          <div key={key} className="space-y-1.5">
-            <label className="text-xs font-medium text-zinc-400 flex items-center gap-1">
-              {label}
-              {required && <span className="text-rose-400">*</span>}
+          <div key={key} className="space-y-1">
+            <label className="text-[10px] font-semibold text-zinc-400 flex items-center justify-between">
+              <span className="truncate">{label}</span>
+              {required && <span className="text-rose-400 font-bold ml-0.5">*</span>}
             </label>
-            <select
-              value={mapping[key] || ''}
-              onChange={(e) => handleChange(key, e.target.value)}
-              className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs text-zinc-100 focus:border-brand-500 focus:outline-none"
-            >
-              <option value="">-- None / Default --</option>
-              {headers.map((h) => (
-                <option key={h} value={h}>
-                  {h}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                value={mapping[key] || ''}
+                onChange={(e) => handleChange(key, e.target.value)}
+                className="w-full appearance-none rounded-lg border border-zinc-700/80 bg-zinc-950 px-2.5 py-1.5 pr-6 text-xs text-zinc-100 font-medium focus:border-brand-500 focus:outline-none cursor-pointer"
+              >
+                <option value="">-- None / Default --</option>
+                {headers.map((h) => (
+                  <option key={h} value={h}>
+                    {h}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="w-3 h-3 text-zinc-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
           </div>
         ))}
       </div>
-    </Card>
+    </div>
   );
 };

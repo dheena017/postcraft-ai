@@ -37,6 +37,13 @@ const INSPIRATION_PROMPTS = [
   'Dreamy watercolor botanical illustration of eucalyptus branches and soft peonies',
 ];
 
+const QUICK_INSPIRATION_CHIPS = [
+  { label: 'Boho Living Room', prompt: 'Aesthetic bohemian living room with cream boucle sofa, pampas grass, warm golden sunshine' },
+  { label: 'Matcha Latte', prompt: 'Minimalist iced matcha latte in ribbed glass with natural morning sunlight and wooden coaster' },
+  { label: 'Scandinavian Kitchen', prompt: 'Moody Scandinavian kitchen with dark olive green shaker cabinets, white marble, brass hardware' },
+  { label: 'Autumn Wardrobe', prompt: 'Autumn cozy capsule wardrobe flat lay with camel trench coat and leather boots' },
+];
+
 function StudioContent() {
   const searchParams = useSearchParams();
   const requestedMode = searchParams.get('mode');
@@ -243,12 +250,12 @@ function StudioContent() {
       {/* ======================================================== */}
       {/* 1. LEFT SIDE PANEL: Compact Controls, Mode Switcher & Form */}
       {/* ======================================================== */}
-      <aside className="w-full lg:w-[370px] xl:w-[390px] flex-shrink-0 flex flex-col h-full border-r border-zinc-800/80 bg-zinc-950 z-10 overflow-hidden">
+      <aside className="w-full lg:w-[410px] xl:w-[430px] flex-shrink-0 flex flex-col h-full border-r border-zinc-800/80 bg-zinc-950 z-10 overflow-hidden">
         {/* Left Panel Header & Mode Switcher */}
         <div className="flex-shrink-0 p-3 border-b border-zinc-800/80 bg-zinc-950/90 backdrop-blur-md space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse" />
+              <Sparkles className="w-3.5 h-3.5 text-brand-400" />
               <h2 className="text-xs font-bold text-white tracking-tight uppercase">
                 Studio Controls
               </h2>
@@ -263,7 +270,7 @@ function StudioContent() {
             <button
               type="button"
               onClick={() => setActiveTab('single')}
-              className={`flex items-center justify-center gap-1 py-1 px-2 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
+              className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
                 activeTab === 'single'
                   ? 'bg-zinc-800 text-white shadow-sm border border-zinc-700/60'
                   : 'text-zinc-400 hover:text-zinc-200'
@@ -276,7 +283,7 @@ function StudioContent() {
             <button
               type="button"
               onClick={() => setActiveTab('sheets')}
-              className={`flex items-center justify-center gap-1 py-1 px-2 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
+              className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
                 activeTab === 'sheets'
                   ? 'bg-zinc-800 text-white shadow-sm border border-zinc-700/60'
                   : 'text-zinc-400 hover:text-zinc-200'
@@ -294,7 +301,7 @@ function StudioContent() {
         </div>
 
         {/* Left Panel Scrollable Form Body */}
-        <div className="flex-1 overflow-y-auto overscroll-contain p-3 space-y-3.5 scrollbar-thin">
+        <div className="flex-1 overflow-y-auto overscroll-contain p-3.5 space-y-3.5 scrollbar-thin">
           {errorMessage && (
             <div className="rounded-xl bg-red-500/10 border border-red-500/30 p-2.5 text-xs text-red-300">
               ⚠️ {errorMessage}
@@ -305,7 +312,7 @@ function StudioContent() {
             /* --- SINGLE PIN FORM --- */
             <form id="single-pin-form" onSubmit={handleGenerate} className="space-y-3.5">
               {/* Image Prompt */}
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-300 flex items-center gap-1">
                     <Sparkles className="w-3 h-3 text-brand-400" />
@@ -327,19 +334,20 @@ function StudioContent() {
                   onChange={(e) => setPrompt(e.target.value)}
                   required
                   placeholder="E.g., Aesthetic Scandinavian living room with beige linen sofa, olive tree, morning sunlight, cozy atmosphere..."
-                  className="w-full rounded-lg border border-zinc-700/80 bg-zinc-900/80 px-3 py-2 text-xs text-zinc-100 placeholder-zinc-500 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 transition-colors"
+                  className="w-full rounded-xl border border-zinc-700/80 bg-zinc-900/80 px-3 py-2 text-xs text-zinc-100 placeholder-zinc-500 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 transition-colors resize-none"
                 />
 
                 {/* Quick Inspiration Chips */}
-                <div className="flex flex-wrap gap-1 pt-0.5">
-                  {INSPIRATION_PROMPTS.slice(0, 2).map((insp, i) => (
+                <div className="flex flex-wrap gap-1.5 pt-0.5">
+                  {QUICK_INSPIRATION_CHIPS.map((chip, i) => (
                     <button
                       key={i}
                       type="button"
-                      onClick={() => setPrompt(insp)}
-                      className="text-[9px] px-1.5 py-0.5 rounded-md bg-zinc-900 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 border border-zinc-800 truncate max-w-[170px] cursor-pointer"
+                      onClick={() => setPrompt(chip.prompt)}
+                      className="text-[10px] px-2 py-1 rounded-md bg-zinc-900/90 text-zinc-300 hover:text-white hover:bg-zinc-800 border border-zinc-800/80 transition-colors cursor-pointer flex items-center gap-1 font-medium"
                     >
-                      💡 {insp}
+                      <span>💡</span>
+                      <span>{chip.label}</span>
                     </button>
                   ))}
                 </div>
@@ -391,21 +399,57 @@ function StudioContent() {
           ) : (
             /* --- BULK SHEETS CONTROLS --- */
             <div className="space-y-3.5">
-              <SheetConnectorCard onParse={handleParseSheet} isLoading={isParsingSheet} />
-
-              {headers.length > 0 && (
-                <div className="space-y-3.5 animate-in fade-in">
-                  <ColumnMappingForm headers={headers} mapping={mapping} onChange={handleMappingChange} />
-
-                  <div className="space-y-3 rounded-lg border border-zinc-800 bg-zinc-900/40 p-3">
-                    <h3 className="text-[10px] font-bold uppercase tracking-wider text-zinc-300 pb-1.5 border-b border-zinc-800">
-                      Batch Output Settings
-                    </h3>
-                    <AspectRatioPicker value={batchAspectRatio} onChange={setBatchAspectRatio} />
-                    <StylePresetSelector value={batchStylePreset} onChange={setBatchStylePreset} />
+              {rows.length > 0 ? (
+                /* Connected Sheet Compact Status Bar */
+                <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-2.5 flex items-center justify-between animate-in fade-in">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
+                    <div className="truncate">
+                      <p className="text-xs font-bold text-emerald-200 truncate">
+                        {rows.length} Rows Connected
+                      </p>
+                      <p className="text-[10px] text-emerald-400/80 truncate">
+                        Ready for batch scheduling
+                      </p>
+                    </div>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRows([]);
+                      setHeaders([]);
+                      setRawCsv(null);
+                    }}
+                    className="text-[10px] font-semibold px-2 py-1 rounded-md bg-zinc-900 text-zinc-300 hover:text-white border border-zinc-700 hover:border-zinc-500 transition-colors cursor-pointer flex-shrink-0"
+                  >
+                    Change Sheet
+                  </button>
                 </div>
+              ) : (
+                /* Connect Sheet Card */
+                <SheetConnectorCard onParse={handleParseSheet} isLoading={isParsingSheet} />
               )}
+
+              {/* Column Mapping (When Sheet Loaded) */}
+              {headers.length > 0 && (
+                <ColumnMappingForm
+                  headers={headers}
+                  mapping={mapping}
+                  onChange={handleMappingChange}
+                />
+              )}
+
+              {/* Batch Output Settings (Always visible to avoid empty voids!) */}
+              <div className="space-y-3 rounded-xl border border-zinc-800/80 bg-zinc-900/60 p-3">
+                <div className="flex items-center justify-between pb-1.5 border-b border-zinc-800/80">
+                  <h3 className="text-[10px] font-bold uppercase tracking-wider text-zinc-300">
+                    Batch Output Settings
+                  </h3>
+                  <span className="text-[10px] text-zinc-500 font-medium">All Pins</span>
+                </div>
+                <AspectRatioPicker value={batchAspectRatio} onChange={setBatchAspectRatio} />
+                <StylePresetSelector value={batchStylePreset} onChange={setBatchStylePreset} />
+              </div>
             </div>
           )}
         </div>

@@ -14,10 +14,10 @@ export const StylePresetSelector: React.FC<StylePresetSelectorProps> = ({ value,
         <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
           Aesthetic Style Filter
         </label>
-        <span className="text-[10px] text-zinc-500 font-medium">8 Presets</span>
+        <span className="text-[10px] text-zinc-500 font-medium">8 Styles</span>
       </div>
 
-      <div className="grid grid-cols-4 gap-1.5">
+      <div className="grid grid-cols-2 gap-1.5">
         {STYLE_PRESETS.map((preset) => {
           const isSelected = value === preset.id;
           return (
@@ -25,17 +25,17 @@ export const StylePresetSelector: React.FC<StylePresetSelectorProps> = ({ value,
               key={preset.id}
               type="button"
               onClick={() => onChange(preset.id)}
-              title={`${preset.name}: ${preset.description}`}
-              className={`group relative overflow-hidden rounded-lg border py-1.5 px-2 text-left transition-all cursor-pointer ${
+              title={preset.description}
+              className={`group flex items-center gap-2 rounded-xl border py-2 px-2.5 text-left transition-all cursor-pointer ${
                 isSelected
-                  ? 'border-brand-500 bg-brand-500/15 shadow-sm shadow-brand-500/10 ring-1 ring-brand-500 text-white'
-                  : 'border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 hover:border-zinc-700 text-zinc-300'
+                  ? 'border-brand-500 bg-brand-500/15 shadow-sm shadow-brand-500/10 ring-1 ring-brand-500 text-white font-semibold'
+                  : 'border-zinc-800 bg-zinc-900/50 hover:bg-zinc-850 hover:border-zinc-700 text-zinc-300'
               }`}
             >
-              <div
-                className={`h-1 w-full rounded-full bg-gradient-to-r ${preset.previewGradient} mb-1 opacity-80 group-hover:opacity-100`}
+              <span
+                className={`w-2.5 h-2.5 rounded-full flex-shrink-0 bg-gradient-to-r ${preset.previewGradient} shadow-xs ring-1 ring-white/20`}
               />
-              <span className="font-semibold text-[11px] block truncate leading-tight">
+              <span className="text-xs truncate leading-tight flex-1">
                 {preset.name}
               </span>
             </button>

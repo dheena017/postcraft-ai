@@ -90,6 +90,36 @@
       "aspectRatio": "2:3",
       "seed": 1076628,
       "createdAt": "2026-11-11T13:35:28.073Z"
+    },
+    {
+      "imageUrl": "https://image.pollinations.ai/prompt/Moody%20Scandinavian%20kitchen%20with%20dark%20olive%20green%20shaker%20cabinets%20and%20brass%20hardware%2C%20high%20fashion%20luxury%20editorial%2C%20Vogue%20magazine%20shoot%2C%20dramatic%20chiaroscuro%20studio%20lighting%2C%20opulent%20elegance%2C%20sleek%20and%20sophisticated%2C%208k%20professional%20commercial%20shoot?width=1000&height=1542&seed=3942232&nologo=true&model=flux&negative=watermark%2C%20logo%2C%20text%2C%20label%2C%20stamp%2C%20copyright%2C%20signature%2C%20blurry%2C%20low%20quality%2C%20pixelated%2C%20jpeg%20artifacts%2C%20distorted%2C%20poorly%20drawn%2C%20watermark%2C%20cheap%2C%20low%20quality%2C%20bad%20lighting%2C%20text%2C%20watermark%20logo",
+      "prompt": "Moody Scandinavian kitchen with dark olive green shaker cabinets and brass hardware",
+      "enhancedPrompt": "Moody Scandinavian kitchen with dark olive green shaker cabinets and brass hardware, high fashion luxury editorial, Vogue magazine shoot, dramatic chiaroscuro studio lighting, opulent elegance, sleek and sophisticated, 8k professional commercial shoot",
+      "width": 1000,
+      "height": 1500,
+      "aspectRatio": "2:3",
+      "seed": 3942232,
+      "createdAt": "2026-11-11T14:28:15.966Z"
+    },
+    {
+      "imageUrl": "https://image.pollinations.ai/prompt/Moody%20Scandinavian%20kitchen%20with%20dark%20olive%20green%20shaker%20cabinets%20and%20brass%20hardware%2C%20high%20fashion%20luxury%20editorial%2C%20Vogue%20magazine%20shoot%2C%20dramatic%20chiaroscuro%20studio%20lighting%2C%20opulent%20elegance%2C%20sleek%20and%20sophisticated%2C%208k%20professional%20commercial%20shoot?width=1280&height=762&seed=2902023&nologo=true&model=flux&negative=watermark%2C%20logo%2C%20text%2C%20label%2C%20stamp%2C%20copyright%2C%20signature%2C%20blurry%2C%20low%20quality%2C%20pixelated%2C%20jpeg%20artifacts%2C%20distorted%2C%20poorly%20drawn%2C%20watermark%2C%20cheap%2C%20low%20quality%2C%20bad%20lighting%2C%20text%2C%20watermark%20logo",
+      "prompt": "Moody Scandinavian kitchen with dark olive green shaker cabinets and brass hardware",
+      "enhancedPrompt": "Moody Scandinavian kitchen with dark olive green shaker cabinets and brass hardware, high fashion luxury editorial, Vogue magazine shoot, dramatic chiaroscuro studio lighting, opulent elegance, sleek and sophisticated, 8k professional commercial shoot",
+      "width": 1280,
+      "height": 720,
+      "aspectRatio": "16:9",
+      "seed": 2902023,
+      "createdAt": "2026-11-11T14:28:29.600Z"
+    },
+    {
+      "imageUrl": "https://image.pollinations.ai/prompt/Minimalist%20iced%20matcha%20latte%20in%20ribbed%20glass%20with%20natural%20morning%20sunlight%2C%20vintage%2035mm%20film%20photograph%2C%20Kodak%20Portra%20400%20aesthetic%2C%20nostalgic%20warm%20tones%2C%20subtle%20film%20grain%2C%20soft%20highlights%2C%20authentic%20vintage%20editorial?width=1280&height=762&seed=9717731&nologo=true&model=flux&negative=watermark%2C%20logo%2C%20text%2C%20label%2C%20stamp%2C%20copyright%2C%20signature%2C%20blurry%2C%20low%20quality%2C%20pixelated%2C%20jpeg%20artifacts%2C%20distorted%2C%20poorly%20drawn%2C%20watermark%2C%20digital%2C%20CGI%2C%20oversaturated%2C%20modern%20digital%20look%2C%20text",
+      "prompt": "Minimalist iced matcha latte in ribbed glass with natural morning sunlight",
+      "enhancedPrompt": "Minimalist iced matcha latte in ribbed glass with natural morning sunlight, vintage 35mm film photograph, Kodak Portra 400 aesthetic, nostalgic warm tones, subtle film grain, soft highlights, authentic vintage editorial",
+      "width": 1280,
+      "height": 720,
+      "aspectRatio": "16:9",
+      "seed": 9717731,
+      "createdAt": "2026-11-11T14:28:44.247Z"
     }
   ],
   "settings": {

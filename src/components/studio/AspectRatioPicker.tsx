@@ -25,19 +25,21 @@ export const AspectRatioPicker: React.FC<AspectRatioPickerProps> = ({ value, onC
               key={item.ratio}
               type="button"
               onClick={() => onChange(item.ratio)}
-              className={`relative flex flex-col items-center justify-center py-1.5 px-1 rounded-lg border text-center transition-all cursor-pointer ${
+              className={`relative flex flex-col items-center justify-center py-2 px-1.5 rounded-xl border text-center transition-all cursor-pointer ${
                 isSelected
-                  ? 'border-brand-500 bg-brand-500/15 shadow-sm shadow-brand-500/10 text-white font-bold'
-                  : 'border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 hover:border-zinc-700 text-zinc-300'
+                  ? 'border-brand-500 bg-brand-500/15 shadow-sm shadow-brand-500/10 text-white font-bold ring-1 ring-brand-500'
+                  : 'border-zinc-800 bg-zinc-900/50 hover:bg-zinc-850 hover:border-zinc-700 text-zinc-300'
               }`}
             >
-              {item.isPinterestOptimal && (
-                <span className="absolute -top-1.5 right-1 px-1 py-0.2 rounded font-black text-[8px] bg-brand-500 text-white uppercase tracking-tighter">
-                  Pin Best
-                </span>
-              )}
-              <span className="text-xs font-bold leading-tight">{item.ratio}</span>
-              <span className="text-[9px] text-zinc-400 leading-none mt-0.5">{item.width}×{item.height}</span>
+              <div className="flex items-center gap-1">
+                <span className="text-xs font-bold leading-tight">{item.ratio}</span>
+                {item.isPinterestOptimal && (
+                  <span className="px-1 py-0.2 rounded font-extrabold text-[8px] bg-brand-500 text-white tracking-tight uppercase leading-none">
+                    Best
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] text-zinc-400 leading-none mt-1">{item.width}×{item.height}</span>
             </button>
           );
         })}
