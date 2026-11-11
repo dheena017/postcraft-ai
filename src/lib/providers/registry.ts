@@ -1,15 +1,12 @@
 import { IPublisherProvider, ProviderStatus } from './types';
 import { PinterestProvider } from './pinterest-provider';
-import { MockProvider } from './mock-provider';
 
 class ProviderRegistry {
   private providers: Map<string, IPublisherProvider> = new Map();
 
   constructor() {
-    // Register primary provider
+    // Register primary live Pinterest provider
     this.register(new PinterestProvider());
-    // Register test simulation provider
-    this.register(new MockProvider());
   }
 
   register(provider: IPublisherProvider): void {
@@ -42,40 +39,6 @@ class ProviderRegistry {
         supportsBulkExport: true,
       });
     }
-
-    // Include future upcoming providers for visibility & roadmap
-    statuses.push(
-      {
-        id: 'instagram',
-        name: 'Instagram (Graph API)',
-        iconName: 'Instagram',
-        isEnabled: false,
-        isConnected: false,
-        channelsCount: 0,
-        supportsDirectPublish: true,
-        supportsBulkExport: true,
-      },
-      {
-        id: 'twitter',
-        name: 'X (Twitter API v2)',
-        iconName: 'Twitter',
-        isEnabled: false,
-        isConnected: false,
-        channelsCount: 0,
-        supportsDirectPublish: true,
-        supportsBulkExport: true,
-      },
-      {
-        id: 'tiktok',
-        name: 'TikTok Business',
-        iconName: 'Video',
-        isEnabled: false,
-        isConnected: false,
-        channelsCount: 0,
-        supportsDirectPublish: true,
-        supportsBulkExport: true,
-      }
-    );
 
     return statuses;
   }

@@ -20,14 +20,8 @@ export class PinterestProvider implements IPublisherProvider {
   async getChannels(): Promise<ChannelTarget[]> {
     const token = await this.getAccessToken();
 
-    // If no live token connected, return mock/starter boards so user can immediately schedule
     if (!token) {
-      return [
-        { id: 'board_default_1', name: '📌 Viral Inspiration & Aesthetic', description: 'Sample Board' },
-        { id: 'board_default_2', name: '🎨 AI Art & Creative Ideas', description: 'Sample Board' },
-        { id: 'board_default_3', name: '✨ Home Decor & Living', description: 'Sample Board' },
-        { id: 'board_default_4', name: '🚀 Business & Marketing', description: 'Sample Board' },
-      ];
+      return [];
     }
 
     try {
@@ -39,10 +33,7 @@ export class PinterestProvider implements IPublisherProvider {
       });
 
       if (!response.ok) {
-        console.warn('Failed to fetch real Pinterest boards, falling back to local list');
-        return [
-          { id: 'board_default_1', name: '📌 My Pinterest Board (Default)', description: 'Connected Board' },
-        ];
+        return [];
       }
 
       const data = await response.json();
@@ -54,7 +45,7 @@ export class PinterestProvider implements IPublisherProvider {
       }));
     } catch (err) {
       console.error('Error fetching Pinterest boards:', err);
-      return [{ id: 'board_default_1', name: '📌 Default Pinterest Board' }];
+      return [];
     }
   }
 
