@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { BrandLogo } from '@/components/ui/BrandLogo';
 import {
   Sparkles,
@@ -26,12 +26,11 @@ interface AppSidebarProps {
 export const AppSidebar: React.FC<AppSidebarProps> = ({
   isOpen = false,
   onClose,
-  isCollapsed = false,
-  onToggleCollapse,
   isOpenMobile = false,
   onCloseMobile,
 }) => {
   const pathname = usePathname();
+  const router = useRouter();
   const [pendingCount, setPendingCount] = useState<number>(0);
 
   // Unified close handler
@@ -46,12 +45,13 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isVisible) {
-        handleClose();
+        onClose?.();
+        onCloseMobile?.();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isVisible]);
+  }, [isVisible, onClose, onCloseMobile]);
 
   useEffect(() => {
     const fetchQueueCount = () => {
@@ -101,7 +101,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
     <>
       {/* Dimmed Background Overlay Backdrop (Click outside to close) */}
       <div
-        className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-150 ${
           isVisible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
         onClick={handleClose}
@@ -110,7 +110,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
 
       {/* Floating Separate Overlay Sidebar Drawer (Page underneath NEVER moves!) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-72 md:w-80 h-full bg-zinc-950 border-r border-zinc-800/80 shadow-2xl flex flex-col select-none overscroll-contain transition-transform duration-300 ease-in-out ${
+        className={`fixed inset-y-0 left-0 z-50 w-72 md:w-80 h-full bg-zinc-950 border-r border-zinc-800/80 shadow-2xl flex flex-col select-none overscroll-contain transition-transform duration-150 ease-out ${
           isVisible ? 'translate-x-0' : '-translate-x-full pointer-events-none'
         }`}
         aria-label="Navigation Sidebar"
@@ -119,6 +119,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         <div className="p-4 border-b border-zinc-800/80 flex items-center justify-between">
           <Link
             href="/dashboard"
+            prefetch={true}
             onClick={handleClose}
             className="overflow-hidden focus:outline-none"
             title="PostCraft AI Dashboard"
@@ -159,8 +160,9 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                     key={item.href}
                     href={item.href}
                     prefetch={true}
+                    onMouseEnter={() => router.prefetch(item.href)}
                     onClick={handleClose}
-                    className={`flex items-center rounded-xl transition-all group justify-between px-3.5 py-2.5 text-xs sm:text-sm font-medium ${
+                    className={`flex items-center rounded-xl transition-colors group justify-between px-3.5 py-2.5 text-xs sm:text-sm font-medium ${
                       isActive
                         ? 'bg-brand-500/15 text-white border border-brand-500/30 shadow-sm shadow-brand-500/10'
                         : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900/70 border border-transparent'

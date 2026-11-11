@@ -1,4 +1,4 @@
-import { ImageGenerationRequest, ImageGenerationResult, AspectRatio } from '@/types/image';
+import { ImageGenerationRequest, ImageGenerationResult } from '@/types/image';
 import { ASPECT_RATIOS } from './presets';
 import { enhancePrompt } from './prompt-enhancer';
 

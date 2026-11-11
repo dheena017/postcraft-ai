@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { AppSidebar } from './AppSidebar';
 import { AppHeader } from './AppHeader';
 import { AppFooter } from './AppFooter';
@@ -13,9 +13,18 @@ interface DashboardShellProps {
 
 export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
   const pathname = usePathname();
+  const router = useRouter();
   const isPublicPage = pathname === '/' || pathname === '/privacy' || pathname === '/terms';
   const isStudioPage = pathname === '/studio';
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Pre-warm all primary routes for instant 0ms navigation transitions
+  useEffect(() => {
+    router.prefetch('/dashboard');
+    router.prefetch('/studio');
+    router.prefetch('/queue');
+    router.prefetch('/gallery');
+  }, [router]);
 
   // When changing pages: reset scroll and close sidebar automatically
   useEffect(() => {

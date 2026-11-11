@@ -1,7 +1,6 @@
 import { getAllJobs, updateJob, addToGallery } from '../db';
 import { generateAiImage } from '../ai/image-generator';
 import { providerRegistry } from '../providers/registry';
-import { ScheduledJob } from '@/types/job';
 
 export interface SchedulerRunResult {
   timestamp: string;

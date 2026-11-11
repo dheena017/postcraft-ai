@@ -18,6 +18,7 @@ export class MockProvider implements IPublisherProvider {
   }
 
   async publish(payload: PublishPayload): Promise<PublishResult> {
+    void payload;
     // Artificial slight delay to simulate network latency
     await new Promise((r) => setTimeout(r, 400));
     return {

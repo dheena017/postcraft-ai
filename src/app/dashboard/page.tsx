@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { ScheduledJob } from '@/types/job';
 import { ImageGenerationResult, StylePresetId } from '@/types/image';
-import { ProviderStatus } from '@/types/provider';
 import { STYLE_PRESETS } from '@/lib/ai/presets';
 import { QuickPublishModal } from '@/components/studio/QuickPublishModal';
 import { removeWatermark } from '@/lib/ai/clean-image';
@@ -15,22 +14,14 @@ import {
   Sparkles,
   FileSpreadsheet,
   Clock,
-  Layers,
   CheckCircle2,
-  AlertCircle,
   Play,
   ArrowRight,
   Download,
   Share2,
-  RefreshCw,
-  Plus,
   ShieldCheck,
   Zap,
-  ExternalLink,
   ChevronRight,
-  Sliders,
-  Calendar,
-  Check,
   TrendingUp,
   Image as ImageIcon,
 } from 'lucide-react';
@@ -41,7 +32,6 @@ export default function DashboardPage() {
   const [gallery, setGallery] = useState<ImageGenerationResult[]>([]);
   const [pinterestAccount, setPinterestAccount] = useState<string | null>(null);
   const [isPinterestConnected, setIsPinterestConnected] = useState<boolean>(false);
-  const [providerStatuses, setProviderStatuses] = useState<ProviderStatus[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [queueTab, setQueueTab] = useState<'UPCOMING' | 'RECENT_PUBLISHED'>('UPCOMING');
 
@@ -78,11 +68,10 @@ export default function DashboardPage() {
 
   const loadDashboardData = async () => {
     try {
-      const [queueRes, galleryRes, authRes, providersRes] = await Promise.all([
+      const [queueRes, galleryRes, authRes] = await Promise.all([
         fetch('/api/queue').then((r) => r.json()).catch(() => []),
         fetch('/api/gallery').then((r) => r.json()).catch(() => []),
         fetch('/api/providers/pinterest/auth').then((r) => r.json()).catch(() => ({})),
-        fetch('/api/providers/status').then((r) => r.json()).catch(() => []),
       ]);
 
       if (Array.isArray(queueRes)) setJobs(queueRes);
@@ -91,7 +80,6 @@ export default function DashboardPage() {
         setIsPinterestConnected(Boolean(authRes.isConnected));
         setPinterestAccount(authRes.connectedAccountName || null);
       }
-      if (Array.isArray(providersRes)) setProviderStatuses(providersRes);
     } catch (err) {
       console.error('Error loading dashboard data:', err);
     } finally {
@@ -608,12 +596,12 @@ export default function DashboardPage() {
                     : 'Run the scheduler or publish pins manually to track live history here.'}
                 </p>
                 <div className="pt-2 flex justify-center gap-2">
-                  <Link href="/studio?mode=sheets">
+                  <Link href="/studio?mode=sheets" prefetch={true}>
                     <Button size="sm" variant="secondary" leftIcon={<FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />}>
                       Connect Sheets
                     </Button>
                   </Link>
-                  <Link href="/studio">
+                  <Link href="/studio" prefetch={true}>
                     <Button size="sm" variant="primary">
                       Open Studio
                     </Button>
@@ -786,7 +774,7 @@ export default function DashboardPage() {
               <p className="text-[11px] text-zinc-400">Public URL &amp; CSV Auto-Parser</p>
             </div>
           </div>
-          <Link href="/studio?mode=sheets">
+          <Link href="/studio?mode=sheets" prefetch={true}>
             <Button size="sm" variant="outline">
               Sync
             </Button>
@@ -803,7 +791,7 @@ export default function DashboardPage() {
               <p className="text-[11px] text-zinc-400">Active background poller</p>
             </div>
           </div>
-          <Link href="/queue">
+          <Link href="/queue" prefetch={true}>
             <Button size="sm" variant="outline">
               Queue
             </Button>

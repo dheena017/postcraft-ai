@@ -15,17 +15,10 @@ import {
   CheckCircle2,
   Layers,
   Wand2,
-  Calendar,
-  ExternalLink,
   ChevronDown,
   ChevronUp,
   LayoutDashboard,
-  Check,
-  X,
   HelpCircle,
-  Eye,
-  Sliders,
-  Flame,
   TrendingUp,
 } from 'lucide-react';
 
@@ -118,7 +111,6 @@ const FAQS = [
 export default function LandingPage() {
   const [activeNiche, setActiveNiche] = useState<NicheDemo>(NICHE_DEMOS[0]);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
-  const [sandboxPrompt, setSandboxPrompt] = useState('');
 
   const toggleFaq = (index: number) => {
     setOpenFaqIndex(openFaqIndex === index ? null : index);
@@ -155,7 +147,7 @@ export default function LandingPage() {
 
           {/* CTAs */}
           <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
-            <Link href="/studio">
+            <Link href="/studio" prefetch={true}>
               <Button
                 size="lg"
                 variant="primary"
@@ -165,7 +157,7 @@ export default function LandingPage() {
                 Launch AI Studio (Free)
               </Button>
             </Link>
-            <Link href="/dashboard">
+            <Link href="/dashboard" prefetch={true}>
               <Button
                 size="lg"
                 variant="secondary"
@@ -175,7 +167,7 @@ export default function LandingPage() {
                 Open Dashboard
               </Button>
             </Link>
-            <Link href="/studio?mode=sheets">
+            <Link href="/studio?mode=sheets" prefetch={true}>
               <Button
                 size="lg"
                 variant="outline"
@@ -303,12 +295,12 @@ export default function LandingPage() {
 
               {/* Interactive Studio Shortcut */}
               <div className="pt-2 flex flex-wrap items-center gap-3">
-                <Link href="/studio">
+                <Link href="/studio" prefetch={true}>
                   <Button variant="primary" size="sm" rightIcon={<ArrowRight className="w-4 h-4" />}>
                     Open in Creative Studio
                   </Button>
                 </Link>
-                <Link href="/dashboard">
+                <Link href="/dashboard" prefetch={true}>
                   <Button variant="outline" size="sm" leftIcon={<LayoutDashboard className="w-4 h-4" />}>
                     Go to Dashboard
                   </Button>
@@ -507,12 +499,12 @@ export default function LandingPage() {
           </div>
 
           <div className="pt-4 flex flex-wrap justify-center gap-4">
-            <Link href="/studio">
+            <Link href="/studio" prefetch={true}>
               <Button size="lg" variant="primary" rightIcon={<Zap className="w-4 h-4" />}>
                 Start Creating Free
               </Button>
             </Link>
-            <Link href="/dashboard">
+            <Link href="/dashboard" prefetch={true}>
               <Button size="lg" variant="secondary" leftIcon={<LayoutDashboard className="w-4 h-4 text-brand-400" />}>
                 Visit Dashboard
               </Button>
@@ -650,12 +642,12 @@ export default function LandingPage() {
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-              <Link href="/studio">
+              <Link href="/studio" prefetch={true}>
                 <Button size="lg" variant="primary" rightIcon={<ArrowRight className="w-5 h-5" />}>
                   Launch AI Studio (Free)
                 </Button>
               </Link>
-              <Link href="/dashboard">
+              <Link href="/dashboard" prefetch={true}>
                 <Button size="lg" variant="secondary" leftIcon={<LayoutDashboard className="w-5 h-5 text-brand-400" />}>
                   Open Dashboard
                 </Button>

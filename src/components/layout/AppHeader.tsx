@@ -8,7 +8,6 @@ import {
   X,
   Play,
   CheckCircle2,
-  AlertCircle,
   FileSpreadsheet,
 } from 'lucide-react';
 import { Button } from '../ui/Button';
@@ -27,7 +26,6 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   onToggleSidebar,
   onToggleMobileMenu,
   onToggleSidebarCollapse,
-  isSidebarCollapsed = false,
 }) => {
   const [isRunningQueue, setIsRunningQueue] = useState(false);
   const [runMessage, setRunMessage] = useState<string | null>(null);
@@ -97,6 +95,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             {/* Brand Logo & Name */}
             <Link
               href="/dashboard"
+              prefetch={true}
               className="flex items-center gap-2.5 focus:outline-none group select-none flex-shrink-0"
               title="PostCraft AI Dashboard"
             >

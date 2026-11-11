@@ -10,8 +10,6 @@ import {
   LayoutDashboard,
   Menu,
   X,
-  HelpCircle,
-  Grid,
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { BrandLogo } from '../ui/BrandLogo';
