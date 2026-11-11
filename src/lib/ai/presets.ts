@@ -1,0 +1,100 @@
+import { AspectRatioConfig, StylePreset } from '@/types/image';
+
+export const ASPECT_RATIOS: AspectRatioConfig[] = [
+  {
+    label: '2:3 Vertical (Pinterest Optimal)',
+    ratio: '2:3',
+    width: 1000,
+    height: 1500,
+    description: 'Standard optimal format for Pinterest pins, max feed engagement',
+    isPinterestOptimal: true,
+  },
+  {
+    label: '1:1 Square (Universal)',
+    ratio: '1:1',
+    width: 1024,
+    height: 1024,
+    description: 'Instagram feed & general social post standard',
+  },
+  {
+    label: '9:16 Full Story / Reel',
+    ratio: '9:16',
+    width: 1080,
+    height: 1920,
+    description: 'Mobile full-screen story and pin format',
+  },
+  {
+    label: '16:9 Landscape',
+    ratio: '16:9',
+    width: 1280,
+    height: 720,
+    description: 'Blog hero, YouTube thumbnail, and website banners',
+  },
+];
+
+export const STYLE_PRESETS: StylePreset[] = [
+  {
+    id: 'aesthetic-minimal',
+    name: 'Aesthetic & Minimalist',
+    description: 'Clean pastel tones, elegant composition, Pinterest viral aesthetic',
+    promptSuffix: 'aesthetic photography, minimalist composition, soft natural lighting, warm pastel tones, clean lines, high-end magazine editorial, 8k resolution, award-winning',
+    negativePrompt: 'watermark, logo, text, branding, blurry, low resolution, ugly, distorted, noisy',
+    previewGradient: 'from-amber-200 via-rose-200 to-indigo-200',
+  },
+  {
+    id: 'photorealistic-8k',
+    name: '8K Hyper-Realistic',
+    description: 'Ultra detailed cinematic photography, depth of field, natural lighting',
+    promptSuffix: 'shot on 35mm lens, f/1.8 aperture, photorealistic, cinematic lighting, ultra-detailed texture, depth of field, Hasselblad medium format photo, masterwork',
+    negativePrompt: 'watermark, text, signature, low quality, cartoon, drawing, deformed eyes, extra limbs',
+    previewGradient: 'from-blue-600 via-slate-700 to-zinc-900',
+  },
+  {
+    id: 'interior-design',
+    name: 'Interior & Architecture',
+    description: 'Architectural Digest style, cozy modern rooms, Scandinavian & boho',
+    promptSuffix: 'Architectural Digest interior photograph, Scandinavian modern decor, natural morning sunlight, cozy atmosphere, oak wood, marble accents, wide angle lens, high resolution',
+    negativePrompt: 'watermark, logo, text, clutter, dark, blurry, distorted perspective',
+    previewGradient: 'from-emerald-300 via-teal-400 to-stone-500',
+  },
+  {
+    id: 'watercolor-art',
+    name: 'Dreamy Watercolor Art',
+    description: 'Soft wet-on-wet watercolor painting, delicate brushstrokes, artistic',
+    promptSuffix: 'masterpiece watercolor painting, delicate brushwork, translucent color washes, wet-on-wet technique, fine art paper texture, dreamy lighting, pastel aesthetic',
+    negativePrompt: 'watermark, photo, 3d render, plastic, neon, jagged lines, text, signature',
+    previewGradient: 'from-pink-300 via-purple-300 to-cyan-300',
+  },
+  {
+    id: 'modern-infographic',
+    name: 'Vector & Flat Art',
+    description: 'Clean vector illustration, modern shapes, bold color palette',
+    promptSuffix: 'modern vector illustration, clean lines, flat design, Behance trending graphic design, harmonious palette, isolated aesthetic composition',
+    negativePrompt: 'watermark, signature, photorealistic, noise, grainy, low-res',
+    previewGradient: 'from-violet-500 via-purple-500 to-pink-500',
+  },
+  {
+    id: 'vintage-retro',
+    name: 'Vintage & Film Grain',
+    description: 'Kodak Portra 400 film aesthetic, 70s warmth, nostalgic glow',
+    promptSuffix: 'vintage 35mm film photograph, Kodak Portra 400 aesthetic, nostalgic warm tones, subtle film grain, soft highlights, authentic vintage editorial',
+    negativePrompt: 'watermark, digital, CGI, oversaturated, modern digital look, text',
+    previewGradient: 'from-amber-400 via-orange-500 to-red-600',
+  },
+  {
+    id: 'luxury-editorial',
+    name: 'Luxury Brand Editorial',
+    description: 'Vogue style high-fashion lighting, opulent textures, chic',
+    promptSuffix: 'high fashion luxury editorial, Vogue magazine shoot, dramatic chiaroscuro studio lighting, opulent elegance, sleek and sophisticated, 8k professional commercial shoot',
+    negativePrompt: 'watermark, cheap, low quality, bad lighting, text, watermark logo',
+    previewGradient: 'from-yellow-500 via-amber-600 to-zinc-900',
+  },
+  {
+    id: 'cyberpunk-neon',
+    name: 'Cyberpunk & Sci-Fi',
+    description: 'Moody neon glows, futuristic aesthetics, vivid electric colors',
+    promptSuffix: 'cyberpunk aesthetic, vibrant neon reflections, atmospheric rain, moody volumetric lighting, futuristic city details, octane render, Unreal Engine 5 look',
+    negativePrompt: 'watermark, daylight, text, flat, dull colors, low resolution',
+    previewGradient: 'from-fuchsia-600 via-purple-700 to-cyan-500',
+  },
+];

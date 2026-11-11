@@ -1,0 +1,29 @@
+{
+  "jobs": [
+    {
+      "id": "job_verify_1",
+      "source": "MANUAL",
+      "prompt": "Aesthetic modern kitchen remodel with sage green cabinets",
+      "title": "Dream Sage Green Kitchen Decor",
+      "description": "Cozy modern interior",
+      "boardName": "Home Decor Ideas",
+      "aspectRatio": "2:3",
+      "providerId": "pinterest",
+      "scheduledFor": "2026-11-11T07:48:09.617Z",
+      "status": "PENDING",
+      "retryCount": 0,
+      "createdAt": "2026-11-11T07:48:09.619Z",
+      "updatedAt": "2026-11-11T07:48:09.619Z"
+    }
+  ],
+  "gallery": [],
+  "settings": {
+    "pinterest": {
+      "connectedAccountName": "DemoUser"
+    },
+    "scheduler": {
+      "autoRunEnabled": true,
+      "pollIntervalSeconds": 60
+    }
+  }
+}
