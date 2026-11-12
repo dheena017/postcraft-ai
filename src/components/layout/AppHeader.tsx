@@ -8,9 +8,9 @@ import {
   X,
   Play,
   CheckCircle2,
-  FileSpreadsheet,
 } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { NotificationDropdown } from './NotificationDropdown';
 
 interface AppHeaderProps {
   isSidebarOpen?: boolean;
@@ -116,17 +116,6 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 
           {/* Right: Quick Action Controls */}
           <div className="flex items-center gap-2.5 sm:gap-3">
-            {/* Quick Demo Template Link */}
-            <a
-              href="/templates/sample-social-schedule.csv"
-              download="sample-social-schedule.csv"
-              className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-zinc-400 hover:text-zinc-200 border border-zinc-800 bg-zinc-900/60 hover:border-zinc-700 transition-colors"
-              title="Download Sample Google Sheets CSV Template"
-            >
-              <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
-              <span>CSV Template</span>
-            </a>
-
             {/* Pinterest Connection Status Pill */}
             <div
               className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-zinc-800 bg-zinc-900/60 select-none"
@@ -141,6 +130,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 Pinterest Connected
               </span>
             </div>
+
+            {/* Notification Bell Popover Trigger */}
+            <NotificationDropdown />
 
             {/* Trigger Background Scheduler Button */}
             <Button

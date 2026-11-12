@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '../ui/Button';
-import { FileSpreadsheet, Upload, Link as LinkIcon, Download, Sparkles } from 'lucide-react';
+import { FileSpreadsheet, Upload, Link as LinkIcon } from 'lucide-react';
 
 interface SheetConnectorCardProps {
   onParse: (payload: { sheetUrl?: string; csvContent?: string }) => void;
@@ -33,49 +33,17 @@ export const SheetConnectorCard: React.FC<SheetConnectorCardProps> = ({ onParse,
     reader.readAsText(file);
   };
 
-  const handleLoadSample = async () => {
-    try {
-      const res = await fetch('/templates/sample-social-schedule.csv');
-      const csvText = await res.text();
-      onParse({ csvContent: csvText });
-    } catch {
-      alert('Could not load sample template');
-    }
-  };
-
   return (
     <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/60 p-3 space-y-2.5">
-      {/* Header with Sample Template Link */}
-      <div className="flex items-center justify-between gap-2 pb-2 border-b border-zinc-800/80">
-        <div>
-          <h3 className="text-xs font-bold text-zinc-100 flex items-center gap-1.5">
-            <FileSpreadsheet className="w-3.5 h-3.5 text-brand-400" />
-            Connect Spreadsheet
-          </h3>
-          <p className="text-[10px] text-zinc-400 mt-0.5">
-            Batch schedule multi-pin campaigns
-          </p>
-        </div>
-
-        <div className="flex items-center gap-1">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleLoadSample}
-            leftIcon={<Sparkles className="w-3 h-3 text-amber-400" />}
-            className="text-[10px] py-1 px-2 h-auto"
-          >
-            Demo Data
-          </Button>
-          <a
-            href="/templates/sample-social-schedule.csv"
-            download="sample-social-schedule.csv"
-            className="inline-flex items-center gap-1 text-[10px] text-zinc-400 hover:text-zinc-200 px-2 py-1 rounded-lg border border-zinc-800 bg-zinc-900/60 transition-colors"
-          >
-            <Download className="w-3 h-3" />
-            <span>CSV</span>
-          </a>
-        </div>
+      {/* Header */}
+      <div className="pb-2 border-b border-zinc-800/80">
+        <h3 className="text-xs font-bold text-zinc-100 flex items-center gap-1.5">
+          <FileSpreadsheet className="w-3.5 h-3.5 text-brand-400" />
+          Connect Spreadsheet
+        </h3>
+        <p className="text-[10px] text-zinc-400 mt-0.5">
+          Batch schedule multi-pin campaigns from Google Sheets or CSV
+        </p>
       </div>
 
       {/* Tabs */}

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateAiImage } from '@/lib/ai/image-generator';
-import { addToGallery } from '@/lib/db';
+import { addToGallery, createNotification } from '@/lib/db';
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,6 +22,19 @@ export async function POST(req: NextRequest) {
 
     // Save to local gallery history
     await addToGallery(result);
+
+    // Create Studio Generation Notification
+    try {
+      const truncatedPrompt = prompt.length > 50 ? `${prompt.slice(0, 47)}...` : prompt;
+      await createNotification({
+        type: 'STUDIO',
+        title: 'New AI Graphic Generated',
+        message: `Image synthesized: "${truncatedPrompt}" (${aspectRatio || '2:3'})`,
+        link: '/gallery',
+      });
+    } catch (e) {
+      console.error('Failed to create generation notification:', e);
+    }
 
     return NextResponse.json(result);
   } catch (error: unknown) {

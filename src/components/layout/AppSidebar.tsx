@@ -12,7 +12,9 @@ import {
   Globe,
   ShieldCheck,
   X,
+  Bell,
 } from 'lucide-react';
+import { useNotifications } from '@/context/NotificationContext';
 
 interface AppSidebarProps {
   isOpen?: boolean;
@@ -32,6 +34,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   const pathname = usePathname();
   const router = useRouter();
   const [pendingCount, setPendingCount] = useState<number>(0);
+  const { unreadCount } = useNotifications();
 
   // Unified close handler
   const handleClose = () => {
@@ -86,6 +89,12 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
           count: pendingCount,
         },
         { label: 'Creations Gallery', href: '/gallery', icon: ImageIcon },
+        {
+          label: 'Notifications',
+          href: '/notifications',
+          icon: Bell,
+          count: unreadCount,
+        },
       ],
     },
     {

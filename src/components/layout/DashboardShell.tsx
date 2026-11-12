@@ -6,6 +6,7 @@ import { AppSidebar } from './AppSidebar';
 import { AppHeader } from './AppHeader';
 import { AppFooter } from './AppFooter';
 import { LandingHeader } from './LandingHeader';
+import { NotificationProvider } from '@/context/NotificationContext';
 
 interface DashboardShellProps {
   children: React.ReactNode;
@@ -24,6 +25,7 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
     router.prefetch('/studio');
     router.prefetch('/queue');
     router.prefetch('/gallery');
+    router.prefetch('/notifications');
   }, [router]);
 
   // When changing pages: reset scroll and close sidebar automatically
@@ -37,36 +39,40 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
   // Public Pages (/, /privacy, /terms): Full-Width Layout
   if (isPublicPage) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex flex-col antialiased">
-        <LandingHeader />
-        <main className="flex-1 w-full">
-          {children}
-        </main>
-        <AppFooter />
-      </div>
+      <NotificationProvider>
+        <div className="min-h-screen bg-zinc-950 flex flex-col antialiased">
+          <LandingHeader />
+          <main className="flex-1 w-full">
+            {children}
+          </main>
+          <AppFooter />
+        </div>
+      </NotificationProvider>
     );
   }
 
   // Inside the App: Separate Overlay Sidebar Drawer - page content underneath NEVER moves or shifts!
   return (
-    <div className="relative w-full h-screen bg-zinc-950 flex flex-col antialiased overflow-hidden">
-      {/* Floating Separate Overlay Drawer */}
-      <AppSidebar
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-      />
-
-      {/* Main Content Area: 100% full width, completely stationary */}
-      <div className="w-full flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-        <AppHeader
-          isSidebarOpen={isSidebarOpen}
-          onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
+    <NotificationProvider>
+      <div className="relative w-full h-screen bg-zinc-950 flex flex-col antialiased overflow-hidden">
+        {/* Floating Separate Overlay Drawer */}
+        <AppSidebar
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
         />
-        {/* Instant Page Container */}
-        <main className={`flex-1 w-full flex flex-col min-h-0 ${isStudioPage ? 'overflow-hidden' : 'overflow-y-auto'}`}>
-          {children}
-        </main>
+
+        {/* Main Content Area: 100% full width, completely stationary */}
+        <div className="w-full flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+          <AppHeader
+            isSidebarOpen={isSidebarOpen}
+            onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
+          />
+          {/* Instant Page Container */}
+          <main className={`flex-1 w-full flex flex-col min-h-0 ${isStudioPage ? 'overflow-hidden' : 'overflow-y-auto'}`}>
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </NotificationProvider>
   );
 };

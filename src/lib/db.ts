@@ -1,6 +1,7 @@
 import { getSqliteDb } from './sqlite';
 import { ScheduledJob } from '@/types/job';
 import { ImageGenerationResult, AspectRatio, StylePresetId } from '@/types/image';
+import { AppNotification, NotificationType } from '@/types/notification';
 
 interface DatabaseSettings {
   pinterest: {
@@ -324,3 +325,151 @@ export async function updateSettings(updates: Partial<DatabaseSettings>): Promis
 
   return merged;
 }
+
+// ==========================================
+// 4. NOTIFICATIONS SQL OPERATIONS
+// ==========================================
+
+interface SqliteNotificationRow {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  read: number;
+  link: string | null;
+  createdAt: string;
+}
+
+function rowToNotification(row: SqliteNotificationRow): AppNotification {
+  return {
+    id: row.id,
+    type: row.type as NotificationType,
+    title: row.title,
+    message: row.message,
+    read: row.read === 1,
+    link: row.link || undefined,
+    createdAt: row.createdAt,
+  };
+}
+
+export async function getAllNotifications(): Promise<AppNotification[]> {
+  const db = getSqliteDb();
+
+  // Check if we need to seed initial welcome notifications
+  const countRow = db.prepare('SELECT COUNT(*) as count FROM notifications').get() as { count: number };
+  if (countRow.count === 0) {
+    const now = new Date();
+    const seedNotifications = [
+      {
+        id: `notif_${Date.now()}_1`,
+        type: 'SYSTEM',
+        title: 'Welcome to PostCraft AI',
+        message: 'Your automated AI Pinterest creator and queue manager is up and running.',
+        read: 0,
+        link: '/studio',
+        createdAt: new Date(now.getTime() - 1000 * 60 * 60 * 2).toISOString(),
+      },
+      {
+        id: `notif_${Date.now()}_2`,
+        type: 'PIN',
+        title: 'Pinterest Integration Active',
+        message: 'Pinterest API OAuth credentials are configured and ready for automated publishing.',
+        read: 0,
+        link: '/dashboard',
+        createdAt: new Date(now.getTime() - 1000 * 60 * 45).toISOString(),
+      },
+      {
+        id: `notif_${Date.now()}_3`,
+        type: 'STUDIO',
+        title: 'AI Studio Engine Ready',
+        message: 'Free high-res image generation with Gemini AI prompt enhancer is online.',
+        read: 0,
+        link: '/studio',
+        createdAt: new Date(now.getTime() - 1000 * 60 * 20).toISOString(),
+      },
+      {
+        id: `notif_${Date.now()}_4`,
+        type: 'QUEUE',
+        title: 'Scheduler Queue Service Online',
+        message: 'Background scheduler is monitoring scheduled pins for automated publishing.',
+        read: 1,
+        link: '/queue',
+        createdAt: new Date(now.getTime() - 1000 * 60 * 10).toISOString(),
+      },
+    ];
+
+    const insertStmt = db.prepare(`
+      INSERT INTO notifications (id, type, title, message, read, link, createdAt)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `);
+
+    db.exec('BEGIN TRANSACTION;');
+    try {
+      for (const item of seedNotifications) {
+        insertStmt.run(item.id, item.type, item.title, item.message, item.read, item.link, item.createdAt);
+      }
+      db.exec('COMMIT;');
+    } catch {
+      db.exec('ROLLBACK;');
+    }
+  }
+
+  const rows = db
+    .prepare('SELECT * FROM notifications ORDER BY createdAt DESC LIMIT 150')
+    .all() as unknown as SqliteNotificationRow[];
+
+  return rows.map(rowToNotification);
+}
+
+export async function createNotification(data: {
+  type: NotificationType;
+  title: string;
+  message: string;
+  link?: string;
+}): Promise<AppNotification> {
+  const db = getSqliteDb();
+  const id = `notif_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+  const now = new Date().toISOString();
+
+  const stmt = db.prepare(`
+    INSERT INTO notifications (id, type, title, message, read, link, createdAt)
+    VALUES (?, ?, ?, ?, 0, ?, ?)
+  `);
+
+  stmt.run(id, data.type, data.title, data.message, data.link || null, now);
+
+  return {
+    id,
+    type: data.type,
+    title: data.title,
+    message: data.message,
+    read: false,
+    link: data.link,
+    createdAt: now,
+  };
+}
+
+export async function markNotificationRead(id: string, read: boolean = true): Promise<boolean> {
+  const db = getSqliteDb();
+  const info = db.prepare('UPDATE notifications SET read = ? WHERE id = ?').run(read ? 1 : 0, id);
+  return info.changes > 0;
+}
+
+export async function markAllNotificationsRead(): Promise<number> {
+  const db = getSqliteDb();
+  const info = db.prepare('UPDATE notifications SET read = 1 WHERE read = 0').run();
+  return info.changes;
+}
+
+export async function deleteNotification(id: string): Promise<boolean> {
+  const db = getSqliteDb();
+  const info = db.prepare('DELETE FROM notifications WHERE id = ?').run(id);
+  return info.changes > 0;
+}
+
+export async function clearAllNotifications(): Promise<number> {
+  const db = getSqliteDb();
+  const info = db.prepare('DELETE FROM notifications').run();
+  return info.changes;
+}
+

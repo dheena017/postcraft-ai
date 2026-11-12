@@ -44,6 +44,14 @@ const QUICK_INSPIRATION_CHIPS = [
   { label: 'Autumn Wardrobe', prompt: 'Autumn cozy capsule wardrobe flat lay with camel trench coat and leather boots' },
 ];
 
+const GENERATION_STEPS = [
+  { id: 1, label: '[01/05] Prompt Semantic Optimization', description: 'Applying aesthetic modifiers & negative suppression tokens' },
+  { id: 2, label: '[02/05] Neural Cluster Connection', description: 'Allocating high-speed GPU diffusion pipeline' },
+  { id: 3, label: '[03/05] High-Definition Latent Diffusion', description: 'Synthesizing multi-pass visual photorealism & texture details' },
+  { id: 4, label: '[04/05] Anti-Watermark Neural Isolation', description: 'Executing server-side neural crop & buffer margin isolation' },
+  { id: 5, label: '[05/05] Canvas Stream & Database Commit', description: 'Rendering 100% clean image and persisting to SQLite gallery' },
+];
+
 function StudioContent() {
   const searchParams = useSearchParams();
   const requestedMode = searchParams.get('mode');

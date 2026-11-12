@@ -1,4 +1,4 @@
-import { getAllJobs, updateJob, addToGallery } from '../db';
+import { getAllJobs, updateJob, addToGallery, createNotification } from '../db';
 import { generateAiImage } from '../ai/image-generator';
 import { providerRegistry } from '../providers/registry';
 
@@ -109,6 +109,29 @@ export async function executeScheduledJobs(): Promise<SchedulerRunResult> {
         status: 'FAILED',
         error: errorMsg,
       });
+    }
+  }
+
+  if (eligibleJobs.length > 0) {
+    try {
+      if (publishedCount > 0) {
+        await createNotification({
+          type: 'QUEUE',
+          title: `Queue Published (${publishedCount} ${publishedCount === 1 ? 'Pin' : 'Pins'})`,
+          message: `Successfully published ${publishedCount} scheduled pin(s) to Pinterest.`,
+          link: '/queue',
+        });
+      }
+      if (failedCount > 0) {
+        await createNotification({
+          type: 'ALERT',
+          title: `Queue Failures (${failedCount})`,
+          message: `${failedCount} pin(s) failed during scheduled execution. Check queue details.`,
+          link: '/queue',
+        });
+      }
+    } catch (e) {
+      console.error('Failed to create scheduler notification:', e);
     }
   }
 

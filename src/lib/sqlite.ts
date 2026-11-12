@@ -36,8 +36,8 @@ export function getSqliteDb(): DatabaseSync {
         providerId TEXT NOT NULL DEFAULT 'pinterest',
         scheduledFor TEXT NOT NULL,
         status TEXT NOT NULL DEFAULT 'PENDING',
-        publishedPostId TEXT,
-        publishedPostUrl TEXT,
+        externalPostId TEXT,
+        externalPostUrl TEXT,
         generatedImageUrl TEXT,
         error TEXT,
         retryCount INTEGER NOT NULL DEFAULT 0,
@@ -62,7 +62,39 @@ export function getSqliteDb(): DatabaseSync {
         value TEXT NOT NULL,
         updatedAt TEXT NOT NULL
       );
+
+      CREATE TABLE IF NOT EXISTS notifications (
+        id TEXT PRIMARY KEY,
+        type TEXT NOT NULL DEFAULT 'SYSTEM',
+        title TEXT NOT NULL,
+        message TEXT NOT NULL,
+        read INTEGER NOT NULL DEFAULT 0,
+        link TEXT,
+        createdAt TEXT NOT NULL
+      );
     `);
+
+    // Safe auto-migration for existing databases
+    try {
+      const columns = dbInstance.prepare("PRAGMA table_info(jobs)").all() as Array<{ name: string }>;
+      const colNames = new Set(columns.map((c) => c.name));
+
+      if (!colNames.has('externalPostId')) {
+        dbInstance.exec('ALTER TABLE jobs ADD COLUMN externalPostId TEXT;');
+      }
+      if (!colNames.has('externalPostUrl')) {
+        dbInstance.exec('ALTER TABLE jobs ADD COLUMN externalPostUrl TEXT;');
+      }
+
+      if (colNames.has('publishedPostId')) {
+        dbInstance.exec('UPDATE jobs SET externalPostId = publishedPostId WHERE externalPostId IS NULL AND publishedPostId IS NOT NULL;');
+      }
+      if (colNames.has('publishedPostUrl')) {
+        dbInstance.exec('UPDATE jobs SET externalPostUrl = publishedPostUrl WHERE externalPostUrl IS NULL AND publishedPostUrl IS NOT NULL;');
+      }
+    } catch (e) {
+      console.error('Database migration error:', e);
+    }
   }
   return dbInstance;
 }
