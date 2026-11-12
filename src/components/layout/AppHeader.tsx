@@ -1,16 +1,15 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { BrandLogoMark } from '@/components/ui/BrandLogo';
 import {
   Menu,
   X,
-  Play,
-  CheckCircle2,
 } from 'lucide-react';
-import { Button } from '../ui/Button';
 import { NotificationDropdown } from './NotificationDropdown';
+import { UserProfileMenu } from './UserProfileMenu';
 
 interface AppHeaderProps {
   isSidebarOpen?: boolean;
@@ -27,9 +26,18 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   onToggleMobileMenu,
   onToggleSidebarCollapse,
 }) => {
-  const [isRunningQueue, setIsRunningQueue] = useState(false);
-  const [runMessage, setRunMessage] = useState<string | null>(null);
-  const [pinterestConnected, setPinterestConnected] = useState<boolean>(false);
+  const router = useRouter();
+
+  const handlePreload = () => {
+    try {
+      router.prefetch('/dashboard');
+      router.prefetch('/studio');
+      router.prefetch('/queue');
+      router.prefetch('/gallery');
+      router.prefetch('/notifications');
+      router.prefetch('/login');
+    } catch {}
+  };
 
   const handleToggle = () => {
     if (onToggleSidebar) {
@@ -41,46 +49,18 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     }
   };
 
-  useEffect(() => {
-    fetch('/api/providers/pinterest/auth')
-      .then((res) => res.json())
-      .then((data) => setPinterestConnected(data.isConnected))
-      .catch(() => {});
-  }, []);
-
-  const handleRunQueue = async () => {
-    setIsRunningQueue(true);
-    setRunMessage(null);
-    try {
-      const res = await fetch('/api/queue/run', { method: 'POST' });
-      const data = await res.json();
-      if (res.ok) {
-        setRunMessage(
-          `Scheduler executed: ${data.processedCount || 0} processed, ${
-            data.publishedCount || 0
-          } published.`
-        );
-      } else {
-        setRunMessage('Queue runner finished');
-      }
-    } catch {
-      setRunMessage('Queue execution triggered');
-    } finally {
-      setIsRunningQueue(false);
-      setTimeout(() => setRunMessage(null), 4500);
-    }
-  };
-
   return (
     <header className="sticky top-0 z-20 w-full border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-xl">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
           {/* Left: Menu Toggle & Brand Logo */}
           <div className="flex items-center gap-3">
-            {/* Sidebar Toggle Button (Opens separate overlay drawer, page doesn't move) */}
+            {/* Sidebar Toggle Button */}
             <button
               type="button"
               onClick={handleToggle}
+              onMouseEnter={handlePreload}
+              onTouchStart={handlePreload}
               className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800/80 border border-zinc-800 transition-colors cursor-pointer flex-shrink-0"
               title={isSidebarOpen ? 'Close Menu' : 'Open Menu'}
               aria-label={isSidebarOpen ? 'Close Menu' : 'Open Menu'}
@@ -116,53 +96,13 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 
           {/* Right: Quick Action Controls */}
           <div className="flex items-center gap-2.5 sm:gap-3">
-            {/* Pinterest Connection Status Pill */}
-            <div
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-zinc-800 bg-zinc-900/60 select-none"
-              title={pinterestConnected ? 'Pinterest: Live Connected' : 'Pinterest: Credentials Active'}
-            >
-              <span
-                className={`w-2 h-2 rounded-full ${
-                  pinterestConnected ? 'bg-emerald-400' : 'bg-emerald-400'
-                }`}
-              />
-              <span className="text-xs font-medium text-zinc-300 hidden sm:inline">
-                Pinterest Connected
-              </span>
-            </div>
-
             {/* Notification Bell Popover Trigger */}
             <NotificationDropdown />
 
-            {/* Trigger Background Scheduler Button */}
-            <Button
-              variant="secondary"
-              size="sm"
-              isLoading={isRunningQueue}
-              onClick={handleRunQueue}
-              leftIcon={<Play className="w-3.5 h-3.5 text-brand-400" />}
-              title="Manually trigger scheduler to process due jobs"
-            >
-              <span className="hidden sm:inline">Run Queue</span>
-            </Button>
+            {/* User Profile & Sign-in Dropdown */}
+            <UserProfileMenu />
           </div>
         </div>
-
-        {/* Banner Notification for queue trigger */}
-        {runMessage && (
-          <div className="py-2 px-3 my-2 text-xs rounded-xl bg-brand-500/10 border border-brand-500/20 text-brand-300 flex items-center justify-between animate-in fade-in">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <span>{runMessage}</span>
-            </div>
-            <button
-              onClick={() => setRunMessage(null)}
-              className="text-zinc-400 hover:text-white text-[11px]"
-            >
-              Dismiss
-            </button>
-          </div>
-        )}
       </div>
     </header>
   );

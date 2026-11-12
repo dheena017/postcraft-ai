@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3000",
+    "dev": "node scripts/server-runner.mjs",
+    "dev:next": "next dev -p 3000",
+    "server": "node scripts/server-runner.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

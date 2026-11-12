@@ -7,6 +7,9 @@ import { AppHeader } from './AppHeader';
 import { AppFooter } from './AppFooter';
 import { LandingHeader } from './LandingHeader';
 import { NotificationProvider } from '@/context/NotificationContext';
+import { AuthProvider } from '@/context/AuthContext';
+import { NavigationProgressBar } from './NavigationProgressBar';
+import { AuthModal } from '@/components/auth/AuthModal';
 
 interface DashboardShellProps {
   children: React.ReactNode;
@@ -16,6 +19,7 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
   const pathname = usePathname();
   const router = useRouter();
   const isPublicPage = pathname === '/' || pathname === '/privacy' || pathname === '/terms';
+  const isLoginPage = pathname === '/login';
   const isStudioPage = pathname === '/studio';
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -26,6 +30,7 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
     router.prefetch('/queue');
     router.prefetch('/gallery');
     router.prefetch('/notifications');
+    router.prefetch('/login');
   }, [router]);
 
   // When changing pages: reset scroll and close sidebar automatically
@@ -36,43 +41,62 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
     } catch {}
   }, [pathname]);
 
-  // Public Pages (/, /privacy, /terms): Full-Width Layout
-  if (isPublicPage) {
+  // Login page layout: standalone colorful experience
+  if (isLoginPage) {
     return (
-      <NotificationProvider>
-        <div className="min-h-screen bg-zinc-950 flex flex-col antialiased">
-          <LandingHeader />
-          <main className="flex-1 w-full">
-            {children}
-          </main>
-          <AppFooter />
-        </div>
-      </NotificationProvider>
+      <AuthProvider>
+        <NotificationProvider>
+          <NavigationProgressBar />
+          {children}
+        </NotificationProvider>
+      </AuthProvider>
     );
   }
 
-  // Inside the App: Separate Overlay Sidebar Drawer - page content underneath NEVER moves or shifts!
-  return (
-    <NotificationProvider>
-      <div className="relative w-full h-screen bg-zinc-950 flex flex-col antialiased overflow-hidden">
-        {/* Floating Separate Overlay Drawer */}
-        <AppSidebar
-          isOpen={isSidebarOpen}
-          onClose={() => setIsSidebarOpen(false)}
-        />
+  // Public Pages (/, /privacy, /terms): Full-Width Layout
+  if (isPublicPage) {
+    return (
+      <AuthProvider>
+        <NotificationProvider>
+          <AuthModal />
+          <div className="min-h-screen bg-zinc-950 flex flex-col antialiased">
+            <LandingHeader />
+            <main className="flex-1 w-full">
+              {children}
+            </main>
+            <AppFooter />
+          </div>
+        </NotificationProvider>
+      </AuthProvider>
+    );
+  }
 
-        {/* Main Content Area: 100% full width, completely stationary */}
-        <div className="w-full flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-          <AppHeader
-            isSidebarOpen={isSidebarOpen}
-            onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
+  // Inside the App: Separate Overlay Sidebar Drawer
+  return (
+    <AuthProvider>
+      <NotificationProvider>
+        <NavigationProgressBar />
+        <AuthModal />
+        <div className="relative w-full h-screen bg-zinc-950 flex flex-col antialiased overflow-hidden">
+          {/* Floating Separate Overlay Drawer */}
+          <AppSidebar
+            isOpen={isSidebarOpen}
+            onClose={() => setIsSidebarOpen(false)}
           />
-          {/* Instant Page Container */}
-          <main className={`flex-1 w-full flex flex-col min-h-0 ${isStudioPage ? 'overflow-hidden' : 'overflow-y-auto'}`}>
-            {children}
-          </main>
+
+          {/* Main Content Area: 100% full width, completely stationary */}
+          <div className="w-full flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+            <AppHeader
+              isSidebarOpen={isSidebarOpen}
+              onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
+            />
+            {/* Instant Page Container */}
+            <main className={`flex-1 w-full flex flex-col min-h-0 ${isStudioPage ? 'overflow-hidden' : 'overflow-y-auto'}`}>
+              {children}
+            </main>
+          </div>
         </div>
-      </div>
-    </NotificationProvider>
+      </NotificationProvider>
+    </AuthProvider>
   );
 };

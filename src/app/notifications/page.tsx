@@ -6,7 +6,6 @@ import {
   Bell,
   CheckCheck,
   Trash2,
-  Filter,
   Search,
   Sparkles,
   Clock,
@@ -17,14 +16,11 @@ import {
   ArrowRight,
   Check,
   PlusCircle,
-  Settings2,
-  SlidersHorizontal,
-  Volume2,
   ShieldCheck,
   Zap,
 } from 'lucide-react';
 import { useNotifications } from '@/context/NotificationContext';
-import { AppNotification, NotificationType } from '@/types/notification';
+import { NotificationType } from '@/types/notification';
 import { Button } from '@/components/ui/Button';
 
 function formatRelativeTime(isoString: string): string {
@@ -113,11 +109,6 @@ export default function NotificationsPage() {
   const [activeTab, setActiveTab] = useState<'all' | 'unread' | 'studio' | 'queue' | 'alerts'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isSendingTest, setIsSendingTest] = useState(false);
-  const [showSettingsModal, setShowSettingsModal] = useState(false);
-
-  // Preference switches (stored in localStorage)
-  const [soundEnabled, setSoundEnabled] = useState(true);
-  const [desktopAlerts, setDesktopAlerts] = useState(false);
 
   // Filtered Notifications
   const filteredNotifications = useMemo(() => {

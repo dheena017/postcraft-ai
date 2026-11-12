@@ -1,6 +1,7 @@
 import { getAllJobs, updateJob, addToGallery, createNotification } from '../db';
 import { generateAiImage } from '../ai/image-generator';
 import { providerRegistry } from '../providers/registry';
+import { logger } from '../logger';
 
 export interface SchedulerRunResult {
   timestamp: string;
@@ -26,6 +27,10 @@ export async function executeScheduledJobs(): Promise<SchedulerRunResult> {
     return scheduleTime <= now;
   });
 
+  logger.scheduler.info(
+    `Discovered ${eligibleJobs.length} eligible job(s) ready for execution (Total jobs in DB: ${allJobs.length})`
+  );
+
   const details: SchedulerRunResult['details'] = [];
   let publishedCount = 0;
   let failedCount = 0;
@@ -36,6 +41,7 @@ export async function executeScheduledJobs(): Promise<SchedulerRunResult> {
 
       // Step 1: Synthesize AI Image if not yet created
       if (!imageUrl) {
+        logger.scheduler.info(`Job ${job.id}: Synthesizing pin image with prompt "${job.prompt.slice(0, 40)}..."`);
         await updateJob(job.id, { status: 'GENERATING' });
         const genResult = await generateAiImage({
           prompt: job.prompt,
@@ -51,6 +57,7 @@ export async function executeScheduledJobs(): Promise<SchedulerRunResult> {
 
         // Also add to gallery
         await addToGallery(genResult);
+        logger.scheduler.debug(`Job ${job.id}: Image generated and archived to gallery`);
       }
 
       // Step 2: Publish via Provider
@@ -76,6 +83,7 @@ export async function executeScheduledJobs(): Promise<SchedulerRunResult> {
           externalPostUrl: publishResult.externalPostUrl,
         });
         publishedCount++;
+        logger.scheduler.success(`Job ${job.id} [${job.title}] published successfully`);
         details.push({
           jobId: job.id,
           title: job.title,
@@ -88,6 +96,7 @@ export async function executeScheduledJobs(): Promise<SchedulerRunResult> {
           retryCount: job.retryCount + 1,
         });
         failedCount++;
+        logger.scheduler.warn(`Job ${job.id} publication failed: ${publishResult.error}`);
         details.push({
           jobId: job.id,
           title: job.title,
@@ -103,6 +112,7 @@ export async function executeScheduledJobs(): Promise<SchedulerRunResult> {
         retryCount: job.retryCount + 1,
       });
       failedCount++;
+      logger.scheduler.error(`Job ${job.id} failed with critical exception: ${errorMsg}`);
       details.push({
         jobId: job.id,
         title: job.title,
@@ -131,7 +141,7 @@ export async function executeScheduledJobs(): Promise<SchedulerRunResult> {
         });
       }
     } catch (e) {
-      console.error('Failed to create scheduler notification:', e);
+      logger.scheduler.error('Failed to create scheduler notification:', e);
     }
   }
 

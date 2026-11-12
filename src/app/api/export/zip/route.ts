@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import JSZip from 'jszip';
 import { getAllJobs } from '@/lib/db';
 import Papa from 'papaparse';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
   try {
@@ -62,11 +63,12 @@ export async function POST(req: NextRequest) {
           }
         }
       } catch (err) {
-        console.warn(`Could not download image for job ${job.id}:`, err);
+        logger.api.warn(`Could not download image for job ${job.id}:`, err);
       }
     }
 
     const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
+    logger.api.success(`Exported ${readyJobs.length} pins and metadata to ZIP bundle (${Math.round(zipBuffer.length / 1024)} KB)`);
 
     return new Response(new Uint8Array(zipBuffer), {
       status: 200,

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Jimp } from 'jimp';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -8,6 +9,7 @@ export async function GET(req: NextRequest) {
   const targetHeight = parseInt(searchParams.get('height') || '1500', 10);
 
   if (!imageUrl) {
+    logger.ai.warn('Watermark cleaner invoked without imageUrl parameter');
     return NextResponse.json({ error: 'Missing imageUrl parameter' }, { status: 400 });
   }
 
@@ -19,6 +21,7 @@ export async function GET(req: NextRequest) {
     });
 
     if (!res.ok) {
+      logger.ai.warn(`Source image fetch failed (${res.status}), redirecting to raw url`);
       return NextResponse.redirect(imageUrl);
     }
 
@@ -50,6 +53,7 @@ export async function GET(req: NextRequest) {
     }
 
     const cleanBuffer = await image.getBuffer('image/jpeg');
+    logger.ai.success(`Watermark cleanly stripped: ${origW}x${origH} -> ${targetWidth}x${targetHeight}`);
 
     return new NextResponse(new Uint8Array(cleanBuffer), {
       headers: {
@@ -58,9 +62,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (err) {
-    console.error('Server clean-image crop error:', err);
-    // Fallback to direct redirect
+    logger.ai.error('Watermark clean crop encountered an issue, falling back to direct URL', err);
     return NextResponse.redirect(imageUrl);
   }
 }
-

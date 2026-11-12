@@ -3,10 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { Select } from '@/components/ui/Select';
 import { QueueStatsSummary } from '@/components/queue/QueueStatsSummary';
 import { QueueJobRow } from '@/components/queue/QueueJobRow';
 import { ScheduledJob, JobStatus } from '@/types/job';
 import { Play, Download, RefreshCw, Plus, Clock } from 'lucide-react';
+import { logger } from '@/lib/logger';
 import Link from 'next/link';
 
 export default function QueuePage() {
@@ -21,9 +23,12 @@ export default function QueuePage() {
     try {
       const res = await fetch('/api/queue');
       const data = await res.json();
-      if (Array.isArray(data)) setJobs(data);
+      if (Array.isArray(data)) {
+        setJobs(data);
+        logger.queue.debug(`Loaded ${data.length} queue items`);
+      }
     } catch (err) {
-      console.error('Error fetching queue:', err);
+      logger.queue.error('Error fetching queue:', err);
     } finally {
       setIsLoading(false);
     }
@@ -148,7 +153,23 @@ export default function QueuePage() {
 
       {/* Filter and Search Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        <div className="flex rounded-xl bg-zinc-950 p-1 border border-zinc-800/80 overflow-x-auto">
+        {/* Mobile Custom Select Dropdown */}
+        <div className="block sm:hidden w-full">
+          <Select
+            value={filter}
+            onChange={(val) => setFilter(val as 'ALL' | JobStatus)}
+            options={[
+              { value: 'ALL', label: `All Jobs (${jobs.length})` },
+              { value: 'PENDING', label: 'Pending Processing' },
+              { value: 'PUBLISHED', label: 'Published Pins' },
+              { value: 'FAILED', label: 'Failed Jobs' },
+            ]}
+            size="sm"
+          />
+        </div>
+
+        {/* Desktop Filter Tabs */}
+        <div className="hidden sm:flex rounded-xl bg-zinc-950 p-1 border border-zinc-800/80 overflow-x-auto">
           {(['ALL', 'PENDING', 'PUBLISHED', 'FAILED'] as const).map((status) => (
             <button
               key={status}

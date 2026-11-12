@@ -13,7 +13,6 @@ import { removeWatermark } from '@/lib/ai/clean-image';
 import {
   Sparkles,
   Wand2,
-  SlidersHorizontal,
   RefreshCw,
   FileSpreadsheet,
   CalendarPlus,
@@ -22,20 +21,14 @@ import {
   Download,
   Share2,
   Maximize2,
-  ShieldCheck,
   LayoutGrid,
+  ShieldCheck,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { AspectRatio, StylePresetId, ImageGenerationResult } from '@/types/image';
 import { ParsedSheetRow, SheetMappingConfig } from '@/types/job';
+import { logger } from '@/lib/logger';
 import Link from 'next/link';
-
-const INSPIRATION_PROMPTS = [
-  'Aesthetic bohemian living room with cream boucle sofa and warm sunshine',
-  'Minimalist iced matcha latte in ribbed glass with natural morning sunlight',
-  'Moody Scandinavian kitchen with dark olive green shaker cabinets and brass hardware',
-  'Autumn cozy capsule wardrobe flat lay with camel trench coat and leather boots',
-  'Dreamy watercolor botanical illustration of eucalyptus branches and soft peonies',
-];
 
 const QUICK_INSPIRATION_CHIPS = [
   { label: 'Boho Living Room', prompt: 'Aesthetic bohemian living room with cream boucle sofa, pampas grass, warm golden sunshine' },
@@ -69,15 +62,22 @@ function StudioContent() {
   const [prompt, setPrompt] = useState('');
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>('2:3');
   const [stylePreset, setStylePreset] = useState<StylePresetId>('aesthetic-minimal');
-  const [showAdvanced, setShowAdvanced] = useState(false);
-  const [negativePrompt, setNegativePrompt] = useState('');
-  const [enhancePrompt, setEnhancePrompt] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [imageResult, setImageResult] = useState<ImageGenerationResult | null>(null);
   const [cleanImageUrl, setCleanImageUrl] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isZoomed, setIsZoomed] = useState(false);
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [enhancePrompt, setEnhancePrompt] = useState(true);
+  const [negativePrompt, setNegativePrompt] = useState('');
+
+  const handleSurpriseMe = () => {
+    const randomChip = QUICK_INSPIRATION_CHIPS[Math.floor(Math.random() * QUICK_INSPIRATION_CHIPS.length)];
+    if (randomChip) {
+      setPrompt(randomChip.prompt);
+    }
+  };
 
   // Automatically remove watermark when imageResult changes
   useEffect(() => {
@@ -117,6 +117,7 @@ function StudioContent() {
 
     setIsGenerating(true);
     setErrorMessage(null);
+    logger.studio.info(`Synthesizing pin prompt: "${prompt.trim().slice(0, 50)}..." [ratio: ${aspectRatio}, preset: ${stylePreset}]`);
 
     try {
       const res = await fetch('/api/ai/generate', {
@@ -126,8 +127,6 @@ function StudioContent() {
           prompt: prompt.trim(),
           aspectRatio,
           stylePreset,
-          negativePrompt: negativePrompt.trim() || undefined,
-          enhancePrompt,
         }),
       });
 
@@ -136,18 +135,15 @@ function StudioContent() {
         throw new Error(data.error || 'Failed to generate image');
       }
 
+      logger.studio.success(`Image synthesis finished: ${data.width}x${data.height} (Seed: ${data.seed})`);
       setImageResult(data);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Generation failed';
+      logger.studio.error(`Generation failed: ${msg}`, err);
       setErrorMessage(msg);
     } finally {
       setIsGenerating(false);
     }
-  };
-
-  const handleSurpriseMe = () => {
-    const random = INSPIRATION_PROMPTS[Math.floor(Math.random() * INSPIRATION_PROMPTS.length)];
-    setPrompt(random);
   };
 
   const handleDownloadClean = async () => {
@@ -268,9 +264,6 @@ function StudioContent() {
                 Studio Controls
               </h2>
             </div>
-            <span className="text-[9px] px-2 py-0.2 rounded-full font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/25">
-              Watermark-Free
-            </span>
           </div>
 
           {/* Segmented Mode Selector */}
@@ -321,20 +314,10 @@ function StudioContent() {
             <form id="single-pin-form" onSubmit={handleGenerate} className="space-y-3.5">
               {/* Image Prompt */}
               <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-300 flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-brand-400" />
-                    Image Prompt
-                  </label>
-                  <button
-                    type="button"
-                    onClick={handleSurpriseMe}
-                    className="text-[10px] text-amber-400 hover:text-amber-300 font-medium flex items-center gap-1 cursor-pointer"
-                  >
-                    <Wand2 className="w-2.5 h-2.5" />
-                    <span>Inspiration</span>
-                  </button>
-                </div>
+                <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-300 flex items-center gap-1">
+                  <Sparkles className="w-3 h-3 text-brand-400" />
+                  Image Prompt
+                </label>
 
                 <textarea
                   rows={2}
@@ -366,43 +349,6 @@ function StudioContent() {
 
               {/* Style Presets */}
               <StylePresetSelector value={stylePreset} onChange={setStylePreset} />
-
-              {/* Advanced Settings Toggle */}
-              <div className="pt-1 border-t border-zinc-800/80">
-                <button
-                  type="button"
-                  onClick={() => setShowAdvanced(!showAdvanced)}
-                  className="flex items-center gap-1.5 text-[11px] font-medium text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer"
-                >
-                  <SlidersHorizontal className="w-3 h-3" />
-                  <span>{showAdvanced ? 'Hide Advanced Options' : 'Advanced (Negative Prompt, Auto-Enhance)'}</span>
-                </button>
-
-                {showAdvanced && (
-                  <div className="mt-2 space-y-2 rounded-lg bg-zinc-900/60 p-2.5 border border-zinc-800">
-                    <label className="flex items-center gap-1.5 text-[11px] text-zinc-300 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={enhancePrompt}
-                        onChange={(e) => setEnhancePrompt(e.target.checked)}
-                        className="rounded border-zinc-700 bg-zinc-900 text-brand-500 focus:ring-brand-500"
-                      />
-                      <span>Auto-apply high-definition aesthetic boosters</span>
-                    </label>
-
-                    <div>
-                      <label className="text-[10px] font-medium text-zinc-400">Custom Negative Prompt</label>
-                      <input
-                        type="text"
-                        value={negativePrompt}
-                        onChange={(e) => setNegativePrompt(e.target.value)}
-                        placeholder="e.g. oversaturated, plastic, artificial lighting"
-                        className="mt-0.5 w-full rounded-md border border-zinc-800 bg-zinc-950 px-2.5 py-1 text-[11px] text-zinc-200 focus:border-brand-500 focus:outline-none"
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
             </form>
           ) : (
             /* --- BULK SHEETS CONTROLS --- */
@@ -586,12 +532,6 @@ function StudioContent() {
           {activeTab === 'single' ? (
             /* --- SINGLE PIN CANVAS STAGE --- */
             <div className="flex-1 flex flex-col items-center justify-center rounded-2xl border border-zinc-800/80 bg-zinc-900/20 p-4 relative overflow-hidden bg-[radial-gradient(#27272a_1px,transparent_1px)] [background-size:20px_20px]">
-              {/* Anti-watermark guarantee pill */}
-              <div className="absolute top-4 left-4 z-10 flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 backdrop-blur-md">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                <span>100% Watermark-Free Engine</span>
-              </div>
-
               {isGenerating ? (
                 /* Generating State */
                 <div className="flex flex-col items-center justify-center text-center space-y-4 py-16 animate-in fade-in">

@@ -8,6 +8,7 @@ import {
   clearAllNotifications,
 } from '@/lib/db';
 import { NotificationType } from '@/types/notification';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,7 +23,7 @@ export async function GET() {
       totalCount: notifications.length,
     });
   } catch (error) {
-    console.error('Failed to fetch notifications:', error);
+    logger.notifications.error('Failed to fetch notifications:', error);
     return NextResponse.json(
       { error: 'Failed to fetch notifications', notifications: [], unreadCount: 0, totalCount: 0 },
       { status: 500 }
@@ -52,9 +53,10 @@ export async function POST(req: NextRequest) {
       link,
     });
 
+    logger.notifications.info(`Notification dispatched: [${notifType}] "${title}"`);
     return NextResponse.json(newNotification, { status: 201 });
   } catch (error) {
-    console.error('Failed to create notification:', error);
+    logger.notifications.error('Failed to create notification:', error);
     return NextResponse.json(
       { error: 'Failed to create notification' },
       { status: 500 }
@@ -69,6 +71,7 @@ export async function PATCH(req: NextRequest) {
 
     if (all) {
       const updatedCount = await markAllNotificationsRead();
+      logger.notifications.debug(`Marked ${updatedCount} notifications as read`);
       return NextResponse.json({ success: true, updatedCount });
     }
 
@@ -81,7 +84,7 @@ export async function PATCH(req: NextRequest) {
 
     return NextResponse.json({ success });
   } catch (error) {
-    console.error('Failed to update notification:', error);
+    logger.notifications.error('Failed to update notification:', error);
     return NextResponse.json(
       { error: 'Failed to update notification' },
       { status: 500 }
@@ -97,6 +100,7 @@ export async function DELETE(req: NextRequest) {
 
     if (all) {
       const deletedCount = await clearAllNotifications();
+      logger.notifications.info(`Cleared ${deletedCount} notifications from history`);
       return NextResponse.json({ success: true, deletedCount });
     }
 
@@ -107,11 +111,10 @@ export async function DELETE(req: NextRequest) {
     const success = await deleteNotification(id);
     return NextResponse.json({ success });
   } catch (error) {
-    console.error('Failed to delete notification:', error);
+    logger.notifications.error('Failed to delete notification:', error);
     return NextResponse.json(
       { error: 'Failed to delete notification' },
       { status: 500 }
     );
   }
 }
-

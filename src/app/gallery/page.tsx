@@ -3,24 +3,34 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { Select } from '@/components/ui/Select';
 import { ImageGenerationResult } from '@/types/image';
 import { Download, Share2, Sparkles, Image as ImageIcon } from 'lucide-react';
 import { QuickPublishModal } from '@/components/studio/QuickPublishModal';
 import { removeWatermark } from '@/lib/ai/clean-image';
+import { logger } from '@/lib/logger';
 import Link from 'next/link';
 
 export default function GalleryPage() {
   const [images, setImages] = useState<ImageGenerationResult[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedForPublish, setSelectedForPublish] = useState<ImageGenerationResult | null>(null);
+  const [ratioFilter, setRatioFilter] = useState('ALL');
+
+  const filteredImages = ratioFilter === 'ALL'
+    ? images
+    : images.filter((img) => img.aspectRatio === ratioFilter);
 
   useEffect(() => {
     fetch('/api/gallery')
       .then((res) => res.json())
       .then((data) => {
-        if (Array.isArray(data)) setImages(data);
+        if (Array.isArray(data)) {
+          setImages(data);
+          logger.client.debug(`Loaded ${data.length} images from creations gallery`);
+        }
       })
-      .catch((err) => console.error(err))
+      .catch((err) => logger.client.error('Failed to load gallery items', err))
       .finally(() => setIsLoading(false));
   }, []);
 
@@ -65,11 +75,29 @@ export default function GalleryPage() {
           </p>
         </div>
 
-        <Link href="/studio">
-          <Button size="sm" variant="primary" leftIcon={<Sparkles className="w-3.5 h-3.5" />}>
-            Create New Image
-          </Button>
-        </Link>
+        <div className="flex items-center gap-3">
+          <div className="w-52">
+            <Select
+              value={ratioFilter}
+              onChange={setRatioFilter}
+              options={[
+                { value: 'ALL', label: `All Ratios (${images.length})` },
+                { value: '2:3', label: '2:3 Vertical' },
+                { value: '1:1', label: '1:1 Square' },
+                { value: '9:16', label: '9:16 Story' },
+                { value: '16:9', label: '16:9 Landscape' },
+              ]}
+              size="sm"
+              placeholder="Filter by Ratio"
+            />
+          </div>
+
+          <Link href="/studio">
+            <Button size="sm" variant="primary" leftIcon={<Sparkles className="w-3.5 h-3.5" />}>
+              Create New Image
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {isLoading ? (
@@ -97,7 +125,7 @@ export default function GalleryPage() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {images.map((img, i) => (
+          {filteredImages.map((img, i) => (
             <Card key={i} className="group p-3 flex flex-col justify-between overflow-hidden">
               <div className="relative rounded-xl overflow-hidden bg-zinc-950 border border-zinc-800/80 aspect-[2/3] mb-3">
                 {/* eslint-disable-next-line @next/next/no-img-element */}

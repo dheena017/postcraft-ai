@@ -1,6 +1,7 @@
 import { DatabaseSync } from 'node:sqlite';
 import path from 'path';
 import fs from 'fs';
+import { logger } from './logger';
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 const DB_PATH = process.env.SQLITE_DB_PATH 
@@ -13,6 +14,7 @@ if (!fs.existsSync(DATA_DIR)) {
 }
 
 let dbInstance: DatabaseSync | null = null;
+let hasLoggedDbInit = false;
 
 export function getSqliteDb(): DatabaseSync {
   if (!dbInstance) {
@@ -92,9 +94,38 @@ export function getSqliteDb(): DatabaseSync {
       if (colNames.has('publishedPostUrl')) {
         dbInstance.exec('UPDATE jobs SET externalPostUrl = publishedPostUrl WHERE externalPostUrl IS NULL AND publishedPostUrl IS NOT NULL;');
       }
+      if (!hasLoggedDbInit) {
+        logger.db.debug('SQLite schema initialized & verified (WAL enabled)');
+        hasLoggedDbInit = true;
+      }
     } catch (e) {
-      console.error('Database migration error:', e);
+      logger.db.error('Database migration error:', e);
     }
   }
   return dbInstance;
+}
+
+export function closeSqliteDb(): void {
+  if (dbInstance) {
+    try {
+      dbInstance.close();
+    } catch {
+      // Already closed
+    }
+    dbInstance = null;
+  }
+}
+
+// Cleanly close SQLite WAL connection on server restart/exit
+if (typeof process !== 'undefined') {
+  const cleanup = () => {
+    if (dbInstance) {
+      try {
+        dbInstance.close();
+      } catch {}
+      dbInstance = null;
+    }
+  };
+  process.once('SIGINT', cleanup);
+  process.once('SIGTERM', cleanup);
 }

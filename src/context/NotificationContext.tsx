@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { AppNotification } from '@/types/notification';
+import { logger } from '@/lib/logger';
 
 interface NotificationContextType {
   notifications: AppNotification[];
@@ -32,7 +33,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         setUnreadCount(typeof data.unreadCount === 'number' ? data.unreadCount : 0);
       }
     } catch (err) {
-      console.error('Failed to load notifications:', err);
+      logger.notifications.error('Failed to load notifications:', err);
     } finally {
       setIsLoading(false);
     }
@@ -41,8 +42,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   useEffect(() => {
     fetchNotifications();
 
-    // Poll every 15 seconds for fresh notifications
-    const interval = setInterval(fetchNotifications, 15000);
+    // Gentle polling for fresh notifications, with immediate refresh on window focus
+    const interval = setInterval(fetchNotifications, 90000);
 
     // Cross-tab and in-window event sync
     const handleSync = () => fetchNotifications();
@@ -75,9 +76,10 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, read: true }),
       });
+      logger.notifications.debug(`Notification marked read: ${id}`);
       dispatchUpdate();
     } catch (err) {
-      console.error('Failed to mark notification read:', err);
+      logger.notifications.error('Failed to mark notification read:', err);
       fetchNotifications();
     }
   };
@@ -93,9 +95,10 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ all: true }),
       });
+      logger.notifications.success('All notifications marked as read');
       dispatchUpdate();
     } catch (err) {
-      console.error('Failed to mark all notifications read:', err);
+      logger.notifications.error('Failed to mark all notifications read:', err);
       fetchNotifications();
     }
   };
@@ -114,9 +117,10 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       await fetch(`/api/notifications?id=${encodeURIComponent(id)}`, {
         method: 'DELETE',
       });
+      logger.notifications.debug(`Notification removed: ${id}`);
       dispatchUpdate();
     } catch (err) {
-      console.error('Failed to delete notification:', err);
+      logger.notifications.error('Failed to delete notification:', err);
       fetchNotifications();
     }
   };
@@ -130,9 +134,10 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       await fetch('/api/notifications?all=true', {
         method: 'DELETE',
       });
+      logger.notifications.info('All notifications cleared by user');
       dispatchUpdate();
     } catch (err) {
-      console.error('Failed to clear notifications:', err);
+      logger.notifications.error('Failed to clear notifications:', err);
       fetchNotifications();
     }
   };
@@ -153,11 +158,12 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }),
       });
       if (res.ok) {
+        logger.notifications.success(`Test notification generated: "${customTitle}"`);
         await fetchNotifications();
         dispatchUpdate();
       }
     } catch (err) {
-      console.error('Failed to send test notification:', err);
+      logger.notifications.error('Failed to send test notification:', err);
     }
   };
 
@@ -187,4 +193,3 @@ export const useNotifications = () => {
   }
   return context;
 };
-

@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { SheetMappingConfig } from '@/types/job';
-import { Settings2, ChevronDown } from 'lucide-react';
+import { Settings2 } from 'lucide-react';
+import { Select } from '@/components/ui/Select';
 
 interface ColumnMappingFormProps {
   headers: string[];
@@ -31,6 +32,11 @@ export const ColumnMappingForm: React.FC<ColumnMappingFormProps> = ({
     { key: 'linkCol', label: 'Destination URL' },
   ];
 
+  const columnOptions = [
+    { value: '', label: '-- None / Default --' },
+    ...headers.map((h) => ({ value: h, label: h })),
+  ];
+
   return (
     <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/60 p-3 space-y-2.5">
       <div className="flex items-center justify-between pb-1.5 border-b border-zinc-800/80">
@@ -45,28 +51,19 @@ export const ColumnMappingForm: React.FC<ColumnMappingFormProps> = ({
         </span>
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-2.5">
         {fields.map(({ key, label, required }) => (
-          <div key={key} className="space-y-1">
-            <label className="text-[10px] font-semibold text-zinc-400 flex items-center justify-between">
-              <span className="truncate">{label}</span>
-              {required && <span className="text-rose-400 font-bold ml-0.5">*</span>}
-            </label>
-            <div className="relative">
-              <select
-                value={mapping[key] || ''}
-                onChange={(e) => handleChange(key, e.target.value)}
-                className="w-full appearance-none rounded-lg border border-zinc-700/80 bg-zinc-950 px-2.5 py-1.5 pr-6 text-xs text-zinc-100 font-medium focus:border-brand-500 focus:outline-none cursor-pointer"
-              >
-                <option value="">-- None / Default --</option>
-                {headers.map((h) => (
-                  <option key={h} value={h}>
-                    {h}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="w-3 h-3 text-zinc-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
-            </div>
+          <div key={key}>
+            <Select
+              label={label}
+              required={required}
+              value={mapping[key] || ''}
+              onChange={(val) => handleChange(key, val)}
+              options={columnOptions}
+              placeholder="-- Select Column --"
+              size="sm"
+              searchable={headers.length > 5}
+            />
           </div>
         ))}
       </div>

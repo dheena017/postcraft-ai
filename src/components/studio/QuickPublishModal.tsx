@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
+import { Select } from '../ui/Select';
 import { Send, Calendar, CheckCircle2 } from 'lucide-react';
 import { ChannelTarget } from '@/types/provider';
 
@@ -154,18 +155,28 @@ export const QuickPublishModal: React.FC<QuickPublishModalProps> = ({
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-zinc-400">Target Pinterest Board</label>
-                <select
+                <Select
+                  label="Target Pinterest Board"
                   value={boardId}
-                  onChange={(e) => setBoardId(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500 focus:outline-none"
-                >
-                  {boards.map((b) => (
-                    <option key={b.id} value={b.id}>
-                      {b.name}
-                    </option>
-                  ))}
-                </select>
+                  onChange={setBoardId}
+                  options={
+                    boards.length > 0
+                      ? boards.map((b) => ({
+                          value: b.id,
+                          label: b.name,
+                          description: b.description || undefined,
+                        }))
+                      : [
+                          { value: 'board_default_1', label: 'Home Decor & Living' },
+                          { value: 'board_default_2', label: 'Aesthetic Quotes & Pins' },
+                          { value: 'board_default_3', label: 'Design Inspiration' },
+                          { value: 'board_default_4', label: 'DIY & Creative Crafts' },
+                        ]
+                  }
+                  searchable={boards.length > 4}
+                  placeholder="Select a Pinterest board..."
+                  size="md"
+                />
               </div>
             </div>
           </div>

@@ -5,8 +5,10 @@ import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import { Select } from '@/components/ui/Select';
 import { ScheduledJob } from '@/types/job';
 import { ImageGenerationResult, StylePresetId } from '@/types/image';
+import { logger } from '@/lib/logger';
 import { STYLE_PRESETS } from '@/lib/ai/presets';
 import { QuickPublishModal } from '@/components/studio/QuickPublishModal';
 import { removeWatermark } from '@/lib/ai/clean-image';
@@ -44,6 +46,14 @@ export default function DashboardPage() {
   const [quickPrompt, setQuickPrompt] = useState('');
   const [quickPreset, setQuickPreset] = useState<StylePresetId>('aesthetic-minimal');
   const [quickBoard, setQuickBoard] = useState('Home Decor Ideas');
+  const [availableBoards, setAvailableBoards] = useState<string[]>([
+    'Home Decor Ideas',
+    'Design Inspiration',
+    'Aesthetic Minimalist Pins',
+    'DIY & Creative Crafts',
+    'Fashion & Lifestyle Trends',
+    'Cozy Workspaces & Tech',
+  ]);
   const [isSynthesizing, setIsSynthesizing] = useState(false);
   const [generatedPreview, setGeneratedPreview] = useState<ImageGenerationResult | null>(null);
   const [publishModalImage, setPublishModalImage] = useState<ImageGenerationResult | null>(null);
@@ -68,20 +78,25 @@ export default function DashboardPage() {
 
   const loadDashboardData = async () => {
     try {
-      const [queueRes, galleryRes, authRes] = await Promise.all([
+      const [queueRes, galleryRes, authRes, boardsRes] = await Promise.all([
         fetch('/api/queue').then((r) => r.json()).catch(() => []),
         fetch('/api/gallery').then((r) => r.json()).catch(() => []),
         fetch('/api/providers/pinterest/auth').then((r) => r.json()).catch(() => ({})),
+        fetch('/api/providers/pinterest/boards').then((r) => r.json()).catch(() => []),
       ]);
 
       if (Array.isArray(queueRes)) setJobs(queueRes);
       if (Array.isArray(galleryRes)) setGallery(galleryRes);
+      if (Array.isArray(boardsRes) && boardsRes.length > 0) {
+        setAvailableBoards(boardsRes.map((b: { name: string }) => b.name));
+      }
       if (authRes) {
         setIsPinterestConnected(Boolean(authRes.isConnected));
         setPinterestAccount(authRes.connectedAccountName || null);
       }
+      logger.client.debug(`Dashboard refreshed: ${queueRes.length || 0} queue jobs, ${galleryRes.length || 0} gallery images`);
     } catch (err) {
-      console.error('Error loading dashboard data:', err);
+      logger.client.error('Error loading dashboard data:', err);
     } finally {
       setIsLoading(false);
     }
@@ -89,8 +104,14 @@ export default function DashboardPage() {
 
   useEffect(() => {
     loadDashboardData();
-    const interval = setInterval(loadDashboardData, 30000);
-    return () => clearInterval(interval);
+    // Gentle refresh on window focus and relaxed interval to avoid terminal spam
+    const handleFocus = () => loadDashboardData();
+    window.addEventListener('focus', handleFocus);
+    const interval = setInterval(loadDashboardData, 120000);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   const handleRunScheduler = async () => {
@@ -438,15 +459,14 @@ export default function DashboardPage() {
 
               {/* Target Board */}
               <div>
-                <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
-                  Target Pinterest Board
-                </label>
-                <input
-                  type="text"
+                <Select
+                  label="Target Pinterest Board"
                   value={quickBoard}
-                  onChange={(e) => setQuickBoard(e.target.value)}
-                  placeholder="Board name (e.g. Home Decor Ideas)"
-                  className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3.5 py-2 text-xs text-zinc-100 placeholder:text-zinc-500 focus:border-brand-500 focus:outline-none"
+                  onChange={setQuickBoard}
+                  options={availableBoards}
+                  placeholder="Select target board..."
+                  size="md"
+                  searchable={availableBoards.length > 4}
                 />
               </div>
 
