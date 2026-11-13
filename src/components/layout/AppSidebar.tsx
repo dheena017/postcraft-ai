@@ -107,10 +107,8 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
 
     const handleSync = () => fetchQueueCount();
     window.addEventListener('postcraft:queue-updated', handleSync);
-    const interval = setInterval(fetchQueueCount, 45000);
 
     return () => {
-      clearInterval(interval);
       window.removeEventListener('postcraft:queue-updated', handleSync);
     };
   }, [isVisible]);

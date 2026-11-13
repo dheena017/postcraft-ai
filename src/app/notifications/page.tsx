@@ -22,6 +22,7 @@ import {
 import { useNotifications } from '@/context/NotificationContext';
 import { NotificationType } from '@/types/notification';
 import { Button } from '@/components/ui/Button';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 function formatRelativeTime(isoString: string): string {
   try {
@@ -371,9 +372,26 @@ export default function NotificationsPage() {
       {/* Main Notification Feed */}
       <div className="space-y-2.5">
         {isLoading ? (
-          <div className="p-12 text-center rounded-2xl bg-zinc-900/40 border border-zinc-800 flex flex-col items-center justify-center space-y-3">
-            <div className="w-8 h-8 rounded-full border-2 border-brand-500/20 border-t-brand-500 animate-spin" />
-            <p className="text-xs text-zinc-400">Loading notifications...</p>
+          <div className="space-y-2.5">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div
+                key={i}
+                className="p-4 rounded-2xl bg-zinc-900/40 border border-zinc-800/80 flex items-start gap-4"
+              >
+                <Skeleton width={40} height={40} className="rounded-xl flex-shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Skeleton width={180} height={16} className="rounded-md" />
+                    <Skeleton width={70} height={12} className="rounded-md" />
+                  </div>
+                  <Skeleton width="90%" height={14} className="rounded-md" />
+                  <div className="flex items-center gap-2 pt-1">
+                    <Skeleton width={60} height={16} className="rounded-full" />
+                    <Skeleton width={80} height={12} className="rounded-md" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : filteredNotifications.length === 0 ? (
           <div className="p-12 text-center rounded-2xl bg-zinc-900/30 border border-zinc-800/80 flex flex-col items-center justify-center space-y-3">

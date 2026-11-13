@@ -3,11 +3,13 @@ import { generateAiImage } from '@/lib/ai/image-generator';
 import { addToGallery, createNotification } from '@/lib/db';
 import { logger } from '@/lib/logger';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: NextRequest) {
   const startTime = Date.now();
   try {
     const body = await req.json();
-    const { prompt, aspectRatio, stylePreset, negativePrompt, seed, enhancePrompt } = body;
+    const { prompt, aspectRatio, stylePreset, lightingPreset, negativePrompt, seed, enhancePrompt, model } = body;
 
     if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
       logger.api.warn('POST /api/ai/generate rejected: prompt is required');
@@ -15,27 +17,30 @@ export async function POST(req: NextRequest) {
     }
 
     const shortPrompt = prompt.length > 60 ? `${prompt.slice(0, 57)}...` : prompt;
-    logger.ai.info(`Initiating synthesis: "${shortPrompt}" [preset: ${stylePreset || 'default'}, ratio: ${aspectRatio || '2:3'}]`);
+    logger.ai.info(`Initiating synthesis: "${shortPrompt}" [model: ${model || 'flux'}, preset: ${stylePreset || 'default'}, lighting: ${lightingPreset || 'auto'}, ratio: ${aspectRatio || '2:3'}]`);
 
     const result = await generateAiImage({
       prompt,
       aspectRatio,
       stylePreset,
+      lightingPreset,
       negativePrompt,
       seed,
       enhancePrompt,
+      model,
     });
 
     const elapsed = Date.now() - startTime;
     logger.ai.success(`Image synthesis complete in ${elapsed}ms`, {
       seed: result.seed,
+      model: result.model || model || 'flux',
       dimensions: `${result.width}x${result.height}`,
       preset: stylePreset,
     });
 
     // Save to local gallery history
     await addToGallery(result);
-    logger.db.debug(`Persisted generation (seed: ${result.seed}) to gallery repository`);
+    logger.db.debug(`Persisted generation (seed: ${result.seed}, model: ${result.model || 'flux'}) to gallery repository`);
 
     // Create Studio Generation Notification
     try {
@@ -43,7 +48,7 @@ export async function POST(req: NextRequest) {
       await createNotification({
         type: 'STUDIO',
         title: 'New AI Graphic Generated',
-        message: `Image synthesized: "${truncatedPrompt}" (${aspectRatio || '2:3'})`,
+        message: `Image synthesized with ${result.model || model || 'flux'}: "${truncatedPrompt}" (${aspectRatio || '2:3'})`,
         link: '/gallery',
       });
     } catch (e) {

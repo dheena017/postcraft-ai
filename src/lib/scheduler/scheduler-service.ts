@@ -47,6 +47,7 @@ export async function executeScheduledJobs(): Promise<SchedulerRunResult> {
           prompt: job.prompt,
           aspectRatio: job.aspectRatio || '2:3',
           stylePreset: job.stylePreset,
+          model: job.model,
         });
 
         imageUrl = genResult.imageUrl;

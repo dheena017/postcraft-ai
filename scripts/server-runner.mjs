@@ -354,7 +354,6 @@ function shouldTriggerRestart(filePath) {
  */
 function setupFileWatchers() {
   const watchPaths = [
-    path.join(ROOT_DIR, 'src'),
     path.join(ROOT_DIR, '.env'),
     path.join(ROOT_DIR, '.env.local'),
     path.join(ROOT_DIR, '.env.development'),

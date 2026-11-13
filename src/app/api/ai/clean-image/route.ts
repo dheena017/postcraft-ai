@@ -33,8 +33,8 @@ export async function GET(req: NextRequest) {
     const origW = image.bitmap.width;
     const origH = image.bitmap.height;
 
-    // Crop bottom watermark buffer
-    const cropBottom = Math.max(42, Math.round(origH * 0.035));
+    // Crop bottom watermark buffer (+64px buffer)
+    const cropBottom = Math.max(64, Math.round(origH * 0.045));
     const cropH = origH - cropBottom;
 
     image.crop({
@@ -52,8 +52,8 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    const cleanBuffer = await image.getBuffer('image/jpeg');
-    logger.ai.success(`Watermark cleanly stripped: ${origW}x${origH} -> ${targetWidth}x${targetHeight}`);
+    const cleanBuffer = await image.getBuffer('image/jpeg', { quality: 98 });
+    logger.ai.success(`Watermark cleanly stripped with 98% Ultra HD quality: ${origW}x${origH}`);
 
     return new NextResponse(new Uint8Array(cleanBuffer), {
       headers: {

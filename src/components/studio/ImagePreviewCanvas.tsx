@@ -5,7 +5,7 @@ import { Download, Share2, Sparkles, Maximize2, ShieldCheck } from 'lucide-react
 import { Button } from '../ui/Button';
 import { QuickPublishModal } from './QuickPublishModal';
 import { ImageGenerationResult } from '@/types/image';
-import { removeWatermark } from '@/lib/ai/clean-image';
+import { removeWatermark, preloadImage } from '@/lib/ai/clean-image';
 
 interface ImagePreviewCanvasProps {
   imageResult: ImageGenerationResult | null;
@@ -19,16 +19,31 @@ export const ImagePreviewCanvas: React.FC<ImagePreviewCanvasProps> = ({
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
   const [cleanImageUrl, setCleanImageUrl] = useState<string>('');
+  const [isImageLoading, setIsImageLoading] = useState(false);
 
   useEffect(() => {
     if (imageResult?.imageUrl) {
-      removeWatermark(imageResult.imageUrl, imageResult.width, imageResult.height).then((clean) => {
-        setCleanImageUrl(clean);
-      });
+      if (cleanImageUrl && (cleanImageUrl.includes(encodeURIComponent(imageResult.imageUrl)) || cleanImageUrl === imageResult.imageUrl)) {
+        setIsImageLoading(false);
+        return;
+      }
+      setIsImageLoading(true);
+      removeWatermark(imageResult.imageUrl, imageResult.width, imageResult.height)
+        .then(async (clean) => {
+          await preloadImage(clean, imageResult.imageUrl);
+          setCleanImageUrl(clean);
+        })
+        .catch(() => {
+          setCleanImageUrl(imageResult.imageUrl);
+        })
+        .finally(() => {
+          setIsImageLoading(false);
+        });
     } else {
       setCleanImageUrl('');
+      setIsImageLoading(false);
     }
-  }, [imageResult]);
+  }, [imageResult, cleanImageUrl]);
 
   const activeUrl = cleanImageUrl || imageResult?.imageUrl || '';
 
@@ -96,12 +111,28 @@ export const ImagePreviewCanvas: React.FC<ImagePreviewCanvasProps> = ({
           </div>
         ) : imageResult ? (
           <div className="flex flex-col items-center w-full max-w-md">
-            <div className="relative group w-full rounded-2xl overflow-hidden border border-zinc-800/90 shadow-2xl shadow-black bg-zinc-900/50">
+            <div
+              className="relative group w-full rounded-2xl overflow-hidden border border-zinc-800/90 shadow-2xl shadow-black bg-zinc-900/50"
+              style={{
+                aspectRatio: `${imageResult.width} / ${imageResult.height}`,
+                minHeight: isImageLoading ? '360px' : undefined,
+              }}
+            >
+              {isImageLoading && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/85 backdrop-blur-sm z-10 animate-in fade-in">
+                  <Sparkles className="w-8 h-8 text-brand-400 animate-spin mb-2" />
+                  <p className="text-xs text-zinc-300 font-medium">Rendering HD preview...</p>
+                </div>
+              )}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={activeUrl}
                 alt={imageResult.prompt}
-                className="w-full h-auto max-h-[540px] object-contain mx-auto transition-transform duration-300 group-hover:scale-[1.01]"
+                onLoad={() => setIsImageLoading(false)}
+                onError={() => setIsImageLoading(false)}
+                className={`w-full h-auto max-h-[540px] object-contain mx-auto transition-all duration-300 group-hover:scale-[1.01] ${
+                  isImageLoading ? 'opacity-0 scale-98' : 'opacity-100 scale-100'
+                }`}
               />
 
               {/* Hover overlay with zoom button */}

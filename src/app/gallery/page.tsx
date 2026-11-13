@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Select';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { ImageGenerationResult } from '@/types/image';
 import { Download, Share2, Sparkles, Image as ImageIcon } from 'lucide-react';
 import { QuickPublishModal } from '@/components/studio/QuickPublishModal';
@@ -101,9 +102,27 @@ export default function GalleryPage() {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 animate-pulse">
-          {[1, 2, 3, 4, 5, 6].map((n) => (
-            <div key={n} className="h-72 rounded-2xl bg-zinc-900 border border-zinc-800" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+            <Card key={n} className="p-3 flex flex-col justify-between space-y-3">
+              <div className="relative rounded-xl overflow-hidden aspect-[2/3] bg-zinc-950 border border-zinc-800/80">
+                <Skeleton width="100%" height="100%" className="rounded-none" />
+                <div className="absolute top-2 left-2">
+                  <Skeleton width={54} height={18} className="rounded-full" />
+                </div>
+              </div>
+              <div className="space-y-1.5 px-0.5">
+                <Skeleton width="85%" height={14} className="rounded-md" />
+                <div className="flex items-center justify-between pt-1">
+                  <Skeleton width={60} height={12} className="rounded-md" />
+                  <Skeleton width={50} height={12} className="rounded-md" />
+                </div>
+              </div>
+              <div className="pt-2 border-t border-zinc-800/60 flex items-center gap-2">
+                <Skeleton width="50%" height={30} className="rounded-lg" />
+                <Skeleton width="50%" height={30} className="rounded-lg" />
+              </div>
+            </Card>
           ))}
         </div>
       ) : images.length === 0 ? (
@@ -134,6 +153,11 @@ export default function GalleryPage() {
                   alt={img.prompt}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
+                {img.model && (
+                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[9px] font-bold bg-brand-500/80 text-white backdrop-blur-md uppercase tracking-wider">
+                    {img.model}
+                  </div>
+                )}
                 <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-black/70 text-zinc-300 backdrop-blur-md">
                   {img.aspectRatio}
                 </div>

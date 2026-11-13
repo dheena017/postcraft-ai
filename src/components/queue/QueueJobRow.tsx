@@ -31,6 +31,8 @@ export const QueueJobRow: React.FC<QueueJobRowProps> = ({ job, onDelete }) => {
           <h4 className="font-semibold text-sm text-zinc-100 line-clamp-1">{job.title}</h4>
           <p className="text-xs text-zinc-400 line-clamp-2 mt-0.5">{job.prompt}</p>
           <div className="flex items-center gap-2 mt-1.5 text-[11px] text-zinc-500">
+            <span>Model: <strong className="text-zinc-300 font-mono">{job.model || 'flux'}</strong></span>
+            <span>•</span>
             <span>Ratio: {job.aspectRatio}</span>
             <span>•</span>
             <span>Board: {job.boardName}</span>

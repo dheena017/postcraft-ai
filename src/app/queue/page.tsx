@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Select';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { QueueStatsSummary } from '@/components/queue/QueueStatsSummary';
 import { QueueJobRow } from '@/components/queue/QueueJobRow';
 import { ScheduledJob, JobStatus } from '@/types/job';
@@ -36,9 +37,6 @@ export default function QueuePage() {
 
   useEffect(() => {
     fetchJobs();
-    // Auto-poll queue every 20 seconds
-    const interval = setInterval(fetchJobs, 20000);
-    return () => clearInterval(interval);
   }, []);
 
   const handleRunScheduler = async () => {
@@ -201,7 +199,47 @@ export default function QueuePage() {
 
       {/* Jobs Table */}
       <Card className="p-0 overflow-hidden">
-        {filteredJobs.length === 0 ? (
+        {isLoading ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-zinc-950/80 text-zinc-400 border-b border-zinc-800">
+                <tr>
+                  <th className="py-3 px-4 font-semibold w-16">Media</th>
+                  <th className="py-3 px-4 font-semibold">Title &amp; Prompt</th>
+                  <th className="py-3 px-4 font-semibold">Channel</th>
+                  <th className="py-3 px-4 font-semibold">Scheduled Date</th>
+                  <th className="py-3 px-4 font-semibold">Status</th>
+                  <th className="py-3 px-4 font-semibold text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-800/60">
+                {[1, 2, 3, 4, 5].map((row) => (
+                  <tr key={row} className="animate-pulse">
+                    <td className="py-3 px-4">
+                      <Skeleton width={48} height={48} className="rounded-xl" />
+                    </td>
+                    <td className="py-3 px-4 space-y-1.5">
+                      <Skeleton width="85%" height={14} className="rounded-md" />
+                      <Skeleton width="55%" height={11} className="rounded-md" />
+                    </td>
+                    <td className="py-3 px-4">
+                      <Skeleton width={90} height={14} className="rounded-md" />
+                    </td>
+                    <td className="py-3 px-4">
+                      <Skeleton width={110} height={14} className="rounded-md" />
+                    </td>
+                    <td className="py-3 px-4">
+                      <Skeleton width={70} height={22} className="rounded-full" />
+                    </td>
+                    <td className="py-3 px-4 text-right">
+                      <Skeleton width={32} height={32} className="rounded-lg ml-auto" />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : filteredJobs.length === 0 ? (
           <div className="py-16 text-center space-y-3">
             <div className="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center mx-auto text-zinc-500">
               <Clock className="w-6 h-6" />

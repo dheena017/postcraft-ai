@@ -1,4 +1,4 @@
-import { AspectRatio, StylePresetId } from './image';
+import { AspectRatio, StylePresetId, AiModelId } from './image';
 
 export type JobStatus = 'PENDING' | 'GENERATING' | 'READY' | 'PUBLISHING' | 'PUBLISHED' | 'FAILED' | 'CANCELLED';
 
@@ -12,6 +12,7 @@ export interface ScheduledJob {
   destinationUrl?: string;
   aspectRatio: AspectRatio;
   stylePreset?: StylePresetId;
+  model?: AiModelId;
   providerId: string; // 'pinterest' | 'instagram' | etc.
   scheduledFor: string; // ISO date string
   status: JobStatus;

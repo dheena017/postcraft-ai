@@ -42,18 +42,12 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   useEffect(() => {
     fetchNotifications();
 
-    // Gentle polling for fresh notifications, with immediate refresh on window focus
-    const interval = setInterval(fetchNotifications, 90000);
-
     // Cross-tab and in-window event sync
     const handleSync = () => fetchNotifications();
     window.addEventListener('postcraft:notifications-refresh', handleSync);
-    window.addEventListener('focus', handleSync);
 
     return () => {
-      clearInterval(interval);
       window.removeEventListener('postcraft:notifications-refresh', handleSync);
-      window.removeEventListener('focus', handleSync);
     };
   }, [fetchNotifications]);
 

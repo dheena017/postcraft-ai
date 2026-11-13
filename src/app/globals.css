@@ -25,6 +25,12 @@ body {
   }
 }
 
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 .animate-glow {
   animation: subtleGlow 3s ease-in-out infinite;
 }
@@ -46,6 +52,17 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #3f3f46;
+}
+
+/* Ultra-fast instant interactive button responsiveness */
+button, [role="button"], a {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:active, [role="button"]:active {
+  transform: scale(0.98);
+  transition-duration: 50ms !important;
 }
 
 /* Respect user accessibility settings */

@@ -1,13 +1,20 @@
 /**
- * PostCraft AI - Universal Colorful & Stylish Logger
+ * PostCraft AI - Unified Universal Logger
  *
- * Provides vibrant ANSI-colored terminal logs on the server (Node.js)
- * and rich CSS-styled pill badge logs in the browser console.
- * Also maintains an in-memory history buffer and browser event broadcast
- * for live in-app log visualizers.
+ * Provides distinct separation for Backend and Frontend logs:
+ * - Clear [BACKEND] and [FRONTEND] visual tags in Node.js server terminal (with vibrant ANSI truecolor).
+ * - Rich CSS badge pill styling in browser console.
+ * - Automatic client-to-server sync: browser logs are automatically forwarded to /api/logs
+ *   so developers can view both backend and frontend logs together in terminal or separated.
+ * - Persistent log files in logs/ directory:
+ *     - logs/backend.log
+ *     - logs/frontend.log
+ *     - logs/combined.log
+ * - In-memory history buffer (capped at 500 entries) with real-time UI event dispatching.
  */
 
 export type LogLevel = 'debug' | 'info' | 'success' | 'warn' | 'error';
+export type LogSource = 'backend' | 'frontend';
 
 export interface LogEntry {
   id: string;
@@ -17,12 +24,16 @@ export interface LogEntry {
   scope: string;
   message: string;
   data?: unknown;
-  source: 'server' | 'client';
+  source: LogSource;
 }
 
-// In-memory buffer of recent logs (capped at 300)
-const MAX_LOGS = 300;
+// In-memory buffer of recent logs (capped at 500)
+const MAX_LOGS = 500;
 const logBuffer: LogEntry[] = [];
+
+// Environment checks
+const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
+const isNode = !isBrowser && typeof process !== 'undefined' && Boolean(process.versions?.node);
 
 // ANSI color escape codes for Node.js terminal
 const ANSI = {
@@ -62,9 +73,6 @@ const ANSI = {
   darkGray: '\x1b[38;2;113;113;122m',     // #71717a
 };
 
-// Check if running in browser
-const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
-
 function getFormattedTime(): string {
   const d = new Date();
   const pad = (n: number, s = 2) => String(n).padStart(s, '0');
@@ -75,36 +83,184 @@ function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
 }
 
+// ============================================================================
+// FILE LOGGING (Node.js Server Only)
+// ============================================================================
+
+let fsModule: typeof import('node:fs') | null = null;
+let pathModule: typeof import('node:path') | null = null;
+let logsDirInitialized = false;
+let logsDirPath = '';
+
+if (isNode) {
+  try {
+    // Dynamic synchronous require to prevent bundler complications in browser builds
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    fsModule = require('fs');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    pathModule = require('path');
+    if (pathModule && fsModule) {
+      logsDirPath = pathModule.join(process.cwd(), 'logs');
+      if (!fsModule.existsSync(logsDirPath)) {
+        fsModule.mkdirSync(logsDirPath, { recursive: true });
+      }
+      logsDirInitialized = true;
+    }
+  } catch {
+    // Ignore in edge runtime or non-fs environments
+  }
+}
+
+function writeToFile(entry: LogEntry) {
+  if (!logsDirInitialized || !fsModule || !pathModule) return;
+
+  try {
+    const isoTime = new Date(entry.epoch).toISOString();
+    const sourceTag = entry.source === 'backend' ? '[BACKEND] ' : '[FRONTEND]';
+    const levelTag = `[${entry.level.toUpperCase()}]`.padEnd(9);
+    const scopeTag = `[${entry.scope.toUpperCase()}]`.padEnd(12);
+
+    let dataStr = '';
+    if (entry.data !== undefined) {
+      try {
+        dataStr = ` ${JSON.stringify(entry.data)}`;
+      } catch {
+        dataStr = ' [Unserializable data]';
+      }
+    }
+
+    const logLine = `[${isoTime}] ${sourceTag} ${levelTag} ${scopeTag} ${entry.message}${dataStr}\n`;
+
+    // 1. Write to specific source log file (logs/backend.log or logs/frontend.log)
+    const specificLogFile = pathModule.join(logsDirPath, `${entry.source}.log`);
+    fsModule.appendFileSync(specificLogFile, logLine, { encoding: 'utf8' });
+
+    // 2. Write to unified combined log file (logs/combined.log)
+    const combinedLogFile = pathModule.join(logsDirPath, 'combined.log');
+    fsModule.appendFileSync(combinedLogFile, logLine, { encoding: 'utf8' });
+  } catch {
+    // Fail silently to avoid interrupting execution
+  }
+}
+
+// ============================================================================
+// BROWSER TO SERVER SYNC QUEUE
+// ============================================================================
+
+let clientQueue: LogEntry[] = [];
+let clientSyncTimer: ReturnType<typeof setTimeout> | null = null;
+let isSyncing = false;
+
+function flushClientQueue() {
+  if (!isBrowser || clientQueue.length === 0 || isSyncing) return;
+
+  const logsToSend = [...clientQueue];
+  clientQueue = [];
+  isSyncing = true;
+
+  try {
+    const payload = JSON.stringify({ logs: logsToSend });
+
+    if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
+      const blob = new Blob([payload], { type: 'application/json' });
+      const sent = navigator.sendBeacon('/api/logs', blob);
+      if (sent) {
+        isSyncing = false;
+        return;
+      }
+    }
+
+    fetch('/api/logs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: payload,
+      keepalive: true,
+    })
+      .catch(() => {
+        // Silently swallow sync failures
+      })
+      .finally(() => {
+        isSyncing = false;
+      });
+  } catch {
+    isSyncing = false;
+  }
+}
+
+function scheduleClientSync(entry: LogEntry) {
+  if (!isBrowser) return;
+
+  // Don't forward logs emitted by the sync operation itself to avoid loops
+  if (entry.scope === 'LOG_SYNC') return;
+
+  clientQueue.push(entry);
+
+  if (clientQueue.length >= 10) {
+    flushClientQueue();
+    return;
+  }
+
+  if (clientSyncTimer) {
+    clearTimeout(clientSyncTimer);
+  }
+
+  clientSyncTimer = setTimeout(() => {
+    flushClientQueue();
+  }, 250);
+}
+
+// Ensure pending browser logs flush on page unload
+if (isBrowser) {
+  try {
+    window.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        flushClientQueue();
+      }
+    });
+    window.addEventListener('pagehide', () => {
+      flushClientQueue();
+    });
+  } catch {
+    // Safe fallback
+  }
+}
+
+// ============================================================================
+// BUFFER MANAGEMENT
+// ============================================================================
+
 function pushToBuffer(entry: LogEntry) {
   logBuffer.push(entry);
   if (logBuffer.length > MAX_LOGS) {
     logBuffer.shift();
   }
 
-  // If in browser, broadcast custom event so UI log drawers can re-render instantly
   if (isBrowser) {
     try {
       window.dispatchEvent(new CustomEvent('postcraft:log', { detail: entry }));
-      // Also store on window for quick devtools inspection
       const w = window as unknown as { __POSTCRAFT_LOGS__?: LogEntry[] };
       if (!w.__POSTCRAFT_LOGS__) w.__POSTCRAFT_LOGS__ = [];
       w.__POSTCRAFT_LOGS__.push(entry);
       if (w.__POSTCRAFT_LOGS__.length > MAX_LOGS) w.__POSTCRAFT_LOGS__.shift();
     } catch {
-      // Ignore if event dispatch fails
+      // Ignore
     }
+    scheduleClientSync(entry);
+  } else if (isNode) {
+    writeToFile(entry);
   }
 }
 
-/**
- * Server-side terminal log printer with ANSI colors
- */
-function logToServer(level: LogLevel, scope: string, message: string, data?: unknown) {
-  const time = getFormattedTime();
+// ============================================================================
+// TERMINAL LOG PRINTER (Node.js Server)
+// ============================================================================
 
-  // Pick level badge with emoji and colors
+function logToServer(entry: LogEntry) {
+  const time = entry.timestamp;
+
+  // Level badge
   let levelBadge = '';
-  switch (level) {
+  switch (entry.level) {
     case 'success':
       levelBadge = `${ANSI.brightGreen}${ANSI.bold}✓ SUCCESS${ANSI.reset}`;
       break;
@@ -122,52 +278,63 @@ function logToServer(level: LogLevel, scope: string, message: string, data?: unk
       break;
   }
 
-  // Format brand tag and scope badge with crisp column alignment
+  // Source Badge: [BACKEND] vs [FRONTEND]
+  const sourceTag =
+    entry.source === 'backend'
+      ? `${ANSI.brandIndigo}${ANSI.bold}[BACKEND] ${ANSI.reset}`
+      : `${ANSI.brandEmerald}${ANSI.bold}[FRONTEND]${ANSI.reset}`;
+
+  // Brand tag & scope badge
   const brandTag = `${ANSI.brandViolet}${ANSI.bold}[PostCraft]${ANSI.reset}`;
   const timeTag = `${ANSI.darkGray}${time}${ANSI.reset}`;
-  const paddedScope = `[${scope.toUpperCase()}]`.padEnd(12);
-  const scopeTag = `${ANSI.brandIndigo}${paddedScope}${ANSI.reset}`;
+  const paddedScope = `[${entry.scope.toUpperCase()}]`.padEnd(12);
+  const scopeTag = `${ANSI.brightBlue}${paddedScope}${ANSI.reset}`;
 
-  const header = `${brandTag} ${timeTag} ${scopeTag} ${levelBadge}  ${message}`;
+  const header = `${brandTag} ${timeTag} ${sourceTag} ${scopeTag} ${levelBadge}  ${entry.message}`;
 
-  if (level === 'error') {
-    if (data !== undefined) {
-      console.error(header, data);
+  if (entry.level === 'error') {
+    if (entry.data !== undefined) {
+      console.error(header, entry.data);
     } else {
       console.error(header);
     }
-  } else if (level === 'warn') {
-    if (data !== undefined) {
-      console.warn(header, data);
+  } else if (entry.level === 'warn') {
+    if (entry.data !== undefined) {
+      console.warn(header, entry.data);
     } else {
       console.warn(header);
     }
   } else {
-    if (data !== undefined) {
-      console.log(header, data);
+    if (entry.data !== undefined) {
+      console.log(header, entry.data);
     } else {
       console.log(header);
     }
   }
 }
 
-/**
- * Client-side browser console log printer with rich CSS %c styles
- */
-function logToBrowser(level: LogLevel, scope: string, message: string, data?: unknown) {
-  const time = getFormattedTime();
+// ============================================================================
+// BROWSER CONSOLE LOG PRINTER (Client Browser)
+// ============================================================================
 
-  // CSS badge styles for Chrome/Firefox/Edge DevTools
+function logToBrowser(entry: LogEntry) {
+  const time = entry.timestamp;
+
+  // CSS badge styles for DevTools
   const brandStyle =
     'background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%); color: #ffffff; font-weight: 700; padding: 2px 7px; border-radius: 4px; font-size: 10px; text-shadow: 0 1px 1px rgba(0,0,0,0.4);';
   const timeStyle =
     'background: #18181b; color: #71717a; padding: 2px 5px; border-radius: 4px; font-size: 10px; font-family: monospace; border: 1px solid #27272a;';
+  const sourceStyle =
+    entry.source === 'backend'
+      ? 'background: #1e1b4b; color: #818cf8; border: 1px solid #4338ca; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700;'
+      : 'background: #022c22; color: #34d399; border: 1px solid #059669; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700;';
   const scopeStyle =
-    'background: #1e1b4b; color: #a5b4fc; border: 1px solid #4338ca; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600;';
+    'background: #27272a; color: #e4e4e7; border: 1px solid #3f3f46; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600;';
 
   let levelStyle = '';
   let levelIcon = '';
-  switch (level) {
+  switch (entry.level) {
     case 'success':
       levelIcon = '✓';
       levelStyle =
@@ -197,11 +364,14 @@ function logToBrowser(level: LogLevel, scope: string, message: string, data?: un
 
   const msgStyle = 'color: #f4f4f5; font-size: 11px; font-weight: 500; margin-left: 4px;';
 
-  const formatStr = `%cPostCraft%c %c${time}%c %c${scope.toUpperCase()}%c %c${levelIcon} ${level.toUpperCase()}%c ${message}`;
+  const sourceLabel = entry.source.toUpperCase();
+  const formatStr = `%cPostCraft%c %c${time}%c %c[${sourceLabel}]%c %c${entry.scope.toUpperCase()}%c %c${levelIcon} ${entry.level.toUpperCase()}%c ${entry.message}`;
   const styles = [
     brandStyle,
     '',
     timeStyle,
+    '',
+    sourceStyle,
     '',
     scopeStyle,
     '',
@@ -209,31 +379,48 @@ function logToBrowser(level: LogLevel, scope: string, message: string, data?: un
     msgStyle,
   ];
 
-  if (level === 'error') {
-    if (data !== undefined) {
-      console.error(formatStr, ...styles, data);
+  if (entry.level === 'error') {
+    if (entry.data !== undefined) {
+      console.error(formatStr, ...styles, entry.data);
     } else {
       console.error(formatStr, ...styles);
     }
-  } else if (level === 'warn') {
-    if (data !== undefined) {
-      console.warn(formatStr, ...styles, data);
+  } else if (entry.level === 'warn') {
+    if (entry.data !== undefined) {
+      console.warn(formatStr, ...styles, entry.data);
     } else {
       console.warn(formatStr, ...styles);
     }
   } else {
-    if (data !== undefined) {
-      console.log(formatStr, ...styles, data);
+    if (entry.data !== undefined) {
+      console.log(formatStr, ...styles, entry.data);
     } else {
       console.log(formatStr, ...styles);
     }
   }
 }
 
-/**
- * Primary dispatch method that saves log to memory buffer and outputs to console
- */
-export function log(level: LogLevel, scope: string, message: string, data?: unknown) {
+// ============================================================================
+// PRIMARY DISPATCH METHOD
+// ============================================================================
+
+export function log(
+  level: LogLevel,
+  scope: string,
+  message: string,
+  data?: unknown,
+  explicitSource?: LogSource | 'server' | 'client'
+) {
+  // Normalize source
+  let source: LogSource;
+  if (explicitSource === 'frontend' || explicitSource === 'client') {
+    source = 'frontend';
+  } else if (explicitSource === 'backend' || explicitSource === 'server') {
+    source = 'backend';
+  } else {
+    source = isBrowser ? 'frontend' : 'backend';
+  }
+
   const entry: LogEntry = {
     id: generateId(),
     timestamp: getFormattedTime(),
@@ -242,64 +429,151 @@ export function log(level: LogLevel, scope: string, message: string, data?: unkn
     scope,
     message,
     data,
-    source: isBrowser ? 'client' : 'server',
+    source,
   };
 
   pushToBuffer(entry);
 
   if (isBrowser) {
-    logToBrowser(level, scope, message, data);
+    logToBrowser(entry);
   } else {
-    logToServer(level, scope, message, data);
+    logToServer(entry);
   }
 }
 
 /**
- * Creates a scoped logger instance for a particular component or service
+ * Creates a scoped logger instance for a specific component or subsystem
  */
-export function createLogger(scope: string) {
+export function createLogger(scope: string, defaultSource?: LogSource | 'server' | 'client') {
   return {
-    debug: (message: string, data?: unknown) => log('debug', scope, message, data),
-    info: (message: string, data?: unknown) => log('info', scope, message, data),
-    success: (message: string, data?: unknown) => log('success', scope, message, data),
-    warn: (message: string, data?: unknown) => log('warn', scope, message, data),
-    error: (message: string, data?: unknown) => log('error', scope, message, data),
+    debug: (message: string, data?: unknown) => log('debug', scope, message, data, defaultSource),
+    info: (message: string, data?: unknown) => log('info', scope, message, data, defaultSource),
+    success: (message: string, data?: unknown) => log('success', scope, message, data, defaultSource),
+    warn: (message: string, data?: unknown) => log('warn', scope, message, data, defaultSource),
+    error: (message: string, data?: unknown) => log('error', scope, message, data, defaultSource),
   };
 }
 
-/**
- * Pre-configured categorized loggers for common subsystems
- */
+// ============================================================================
+// PRE-CONFIGURED SCATEGORIZED LOGGERS
+// ============================================================================
+
 export const logger = {
-  // Direct level methods with default scope
+  // Direct level methods (auto-detects source)
   debug: (message: string, data?: unknown) => log('debug', 'APP', message, data),
   info: (message: string, data?: unknown) => log('info', 'APP', message, data),
   success: (message: string, data?: unknown) => log('success', 'APP', message, data),
   warn: (message: string, data?: unknown) => log('warn', 'APP', message, data),
   error: (message: string, data?: unknown) => log('error', 'APP', message, data),
 
-  // Scoped sub-loggers
-  server: createLogger('SERVER'),
-  api: createLogger('API'),
-  ai: createLogger('AI-FLUX'),
-  db: createLogger('DATABASE'),
-  scheduler: createLogger('SCHEDULER'),
-  pinterest: createLogger('PINTEREST'),
-  notifications: createLogger('NOTIFY'),
-  auth: createLogger('AUTH'),
-  studio: createLogger('STUDIO'),
-  queue: createLogger('QUEUE'),
-  client: createLogger('CLIENT'),
+  // Dedicated Backend Loggers
+  backend: createLogger('BACKEND', 'backend'),
+  server: createLogger('SERVER', 'backend'),
+  api: createLogger('API', 'backend'),
+  ai: createLogger('AI-FLUX', 'backend'),
+  db: createLogger('DATABASE', 'backend'),
+  scheduler: createLogger('SCHEDULER', 'backend'),
+  pinterest: createLogger('PINTEREST', 'backend'),
+  sheets: createLogger('SHEETS', 'backend'),
+  auth: createLogger('AUTH', 'backend'),
+  notifications: createLogger('NOTIFY', 'backend'),
+
+  // Dedicated Frontend Loggers
+  frontend: createLogger('FRONTEND', 'frontend'),
+  client: createLogger('CLIENT', 'frontend'),
+  studio: createLogger('STUDIO', 'frontend'),
+  queue: createLogger('QUEUE', 'frontend'),
+  ui: createLogger('UI', 'frontend'),
 
   // Custom scoped logger factory
-  scope: (name: string) => createLogger(name),
+  scope: (name: string, source?: LogSource | 'server' | 'client') => createLogger(name, source),
 
-  // Buffer accessors
-  getHistory: () => [...logBuffer],
-  clearHistory: () => {
-    logBuffer.length = 0;
+  // Ingest logs originating remotely (e.g. from frontend via /api/logs)
+  recordRemoteLog: (entry: Partial<LogEntry> & { message: string; scope?: string; level?: LogLevel }) => {
+    const fullEntry: LogEntry = {
+      id: entry.id || generateId(),
+      timestamp: entry.timestamp || getFormattedTime(),
+      epoch: entry.epoch || Date.now(),
+      level: entry.level || 'info',
+      scope: entry.scope || 'FRONTEND',
+      message: entry.message,
+      data: entry.data,
+      source: entry.source === 'backend' ? 'backend' : 'frontend',
+    };
+
+    // Push into memory buffer and write to disk
+    logBuffer.push(fullEntry);
+    if (logBuffer.length > MAX_LOGS) logBuffer.shift();
+
+    if (isNode) {
+      writeToFile(fullEntry);
+      logToServer(fullEntry);
+    }
+  },
+
+  // Buffer queries with filtering
+  getHistory: (filter?: {
+    source?: LogSource | 'all';
+    level?: LogLevel | 'all';
+    search?: string;
+    limit?: number;
+  }): LogEntry[] => {
+    let result = [...logBuffer];
+
+    if (filter?.source && filter.source !== 'all') {
+      result = result.filter((e) => e.source === filter.source);
+    }
+
+    if (filter?.level && filter.level !== 'all') {
+      result = result.filter((e) => e.level === filter.level);
+    }
+
+    if (filter?.search && filter.search.trim()) {
+      const q = filter.search.toLowerCase();
+      result = result.filter(
+        (e) =>
+          e.message.toLowerCase().includes(q) ||
+          e.scope.toLowerCase().includes(q) ||
+          e.level.toLowerCase().includes(q)
+      );
+    }
+
+    if (filter?.limit && filter.limit > 0) {
+      result = result.slice(-filter.limit);
+    }
+
+    return result;
+  },
+
+  // Truncate logs
+  clearHistory: (source?: LogSource | 'all') => {
+    if (!source || source === 'all') {
+      logBuffer.length = 0;
+    } else {
+      for (let i = logBuffer.length - 1; i >= 0; i--) {
+        if (logBuffer[i].source === source) {
+          logBuffer.splice(i, 1);
+        }
+      }
+    }
+
+    // Truncate log files if on server
+    if (isNode && logsDirInitialized && fsModule && pathModule) {
+      try {
+        if (!source || source === 'all' || source === 'backend') {
+          fsModule.writeFileSync(pathModule.join(logsDirPath, 'backend.log'), '');
+        }
+        if (!source || source === 'all' || source === 'frontend') {
+          fsModule.writeFileSync(pathModule.join(logsDirPath, 'frontend.log'), '');
+        }
+        if (!source || source === 'all') {
+          fsModule.writeFileSync(pathModule.join(logsDirPath, 'combined.log'), '');
+        }
+      } catch {
+        // Safe fallback
+      }
+    }
   },
 };
 
 export default logger;
-

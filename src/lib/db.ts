@@ -38,6 +38,7 @@ interface SqliteJobRow {
   destinationUrl: string | null;
   aspectRatio: string;
   stylePreset: string | null;
+  model: string | null;
   providerId: string;
   scheduledFor: string;
   status: string;
@@ -61,6 +62,7 @@ function rowToJob(row: SqliteJobRow): ScheduledJob {
     destinationUrl: row.destinationUrl || undefined,
     aspectRatio: (row.aspectRatio || '2:3') as AspectRatio,
     stylePreset: (row.stylePreset || undefined) as StylePresetId | undefined,
+    model: (row.model || 'flux') as ScheduledJob['model'],
     providerId: row.providerId,
     scheduledFor: row.scheduledFor,
     status: row.status as ScheduledJob['status'],
@@ -98,9 +100,9 @@ export async function createJob(job: Omit<ScheduledJob, 'id' | 'createdAt' | 'up
   const stmt = db.prepare(`
     INSERT INTO jobs (
       id, source, prompt, title, description, boardName, destinationUrl,
-      aspectRatio, stylePreset, providerId, scheduledFor, status,
+      aspectRatio, stylePreset, model, providerId, scheduledFor, status,
       generatedImageUrl, externalPostId, externalPostUrl, error, retryCount, createdAt, updatedAt
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
   `);
 
   stmt.run(
@@ -113,6 +115,7 @@ export async function createJob(job: Omit<ScheduledJob, 'id' | 'createdAt' | 'up
     job.destinationUrl || null,
     job.aspectRatio || '2:3',
     job.stylePreset || null,
+    job.model || 'flux',
     job.providerId || 'pinterest',
     job.scheduledFor,
     job.status || 'PENDING',
@@ -134,9 +137,9 @@ export async function createBulkJobs(jobs: Array<Omit<ScheduledJob, 'id' | 'crea
   const stmt = db.prepare(`
     INSERT INTO jobs (
       id, source, prompt, title, description, boardName, destinationUrl,
-      aspectRatio, stylePreset, providerId, scheduledFor, status,
+      aspectRatio, stylePreset, model, providerId, scheduledFor, status,
       generatedImageUrl, externalPostId, externalPostUrl, error, retryCount, createdAt, updatedAt
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
   `);
 
   const created: ScheduledJob[] = [];
@@ -155,6 +158,7 @@ export async function createBulkJobs(jobs: Array<Omit<ScheduledJob, 'id' | 'crea
         job.destinationUrl || null,
         job.aspectRatio || '2:3',
         job.stylePreset || null,
+        job.model || 'flux',
         job.providerId || 'pinterest',
         job.scheduledFor,
         job.status || 'PENDING',
@@ -196,7 +200,7 @@ export async function updateJob(id: string, updates: Partial<ScheduledJob>): Pro
   const stmt = db.prepare(`
     UPDATE jobs SET
       source = ?, prompt = ?, title = ?, description = ?, boardName = ?,
-      destinationUrl = ?, aspectRatio = ?, stylePreset = ?, providerId = ?,
+      destinationUrl = ?, aspectRatio = ?, stylePreset = ?, model = ?, providerId = ?,
       scheduledFor = ?, status = ?, generatedImageUrl = ?, externalPostId = ?,
       externalPostUrl = ?, error = ?, retryCount = ?, updatedAt = ?
     WHERE id = ?
@@ -211,6 +215,7 @@ export async function updateJob(id: string, updates: Partial<ScheduledJob>): Pro
     merged.destinationUrl || null,
     merged.aspectRatio,
     merged.stylePreset || null,
+    merged.model || 'flux',
     merged.providerId,
     merged.scheduledFor,
     merged.status,
@@ -245,6 +250,7 @@ interface SqliteGalleryRow {
   height: number;
   aspectRatio: string;
   seed: number;
+  model: string | null;
   createdAt: string;
 }
 
@@ -259,6 +265,7 @@ export async function getGallery(): Promise<ImageGenerationResult[]> {
     height: r.height,
     aspectRatio: r.aspectRatio as AspectRatio,
     seed: r.seed,
+    model: (r.model || 'flux') as ImageGenerationResult['model'],
     createdAt: r.createdAt,
   }));
 }
@@ -268,8 +275,8 @@ export async function addToGallery(item: ImageGenerationResult): Promise<void> {
   const id = `img_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
   const stmt = db.prepare(`
-    INSERT INTO gallery (id, imageUrl, prompt, enhancedPrompt, width, height, aspectRatio, seed, createdAt)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO gallery (id, imageUrl, prompt, enhancedPrompt, width, height, aspectRatio, seed, model, createdAt)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
   stmt.run(
@@ -281,6 +288,7 @@ export async function addToGallery(item: ImageGenerationResult): Promise<void> {
     item.height,
     item.aspectRatio,
     item.seed,
+    item.model || 'flux',
     item.createdAt || new Date().toISOString()
   );
 }

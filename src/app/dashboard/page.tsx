@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Select } from '@/components/ui/Select';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { ScheduledJob } from '@/types/job';
 import { ImageGenerationResult, StylePresetId } from '@/types/image';
 import { logger } from '@/lib/logger';
@@ -104,14 +105,6 @@ export default function DashboardPage() {
 
   useEffect(() => {
     loadDashboardData();
-    // Gentle refresh on window focus and relaxed interval to avoid terminal spam
-    const handleFocus = () => loadDashboardData();
-    window.addEventListener('focus', handleFocus);
-    const interval = setInterval(loadDashboardData, 120000);
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener('focus', handleFocus);
-    };
   }, []);
 
   const handleRunScheduler = async () => {
@@ -321,7 +314,11 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-3xl font-black text-white">{totalCreations}</div>
+            {isLoading ? (
+              <Skeleton width={60} height={36} className="rounded-lg mb-1" />
+            ) : (
+              <div className="text-3xl font-black text-white">{totalCreations}</div>
+            )}
             <div className="flex items-center gap-1.5 mt-1 text-[11px] text-emerald-400 font-medium">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>100% Watermark-Free</span>
@@ -340,9 +337,13 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-3xl font-black text-white">{pendingJobs.length}</div>
+            {isLoading ? (
+              <Skeleton width={50} height={36} className="rounded-lg mb-1" />
+            ) : (
+              <div className="text-3xl font-black text-white">{pendingJobs.length}</div>
+            )}
             <div className="flex items-center gap-1 mt-1 text-[11px] text-zinc-400">
-              <span>{totalJobs} total tasks logged</span>
+              <span>{isLoading ? 'Loading queue...' : `${totalJobs} total tasks logged`}</span>
             </div>
           </div>
         </Card>
@@ -358,7 +359,11 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-3xl font-black text-white">{publishedJobs.length}</div>
+            {isLoading ? (
+              <Skeleton width={50} height={36} className="rounded-lg mb-1" />
+            ) : (
+              <div className="text-3xl font-black text-white">{publishedJobs.length}</div>
+            )}
             <div className="flex items-center gap-1 mt-1 text-[11px] text-emerald-400">
               <TrendingUp className="w-3.5 h-3.5" />
               <span>Direct to Pinterest</span>
@@ -383,11 +388,15 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-base font-bold text-white truncate">
-              {isPinterestConnected
-                ? pinterestAccount || 'Connected'
-                : 'Demo Mode'}
-            </div>
+            {isLoading ? (
+              <Skeleton width={120} height={24} className="rounded-md mb-1" />
+            ) : (
+              <div className="text-base font-bold text-white truncate">
+                {isPinterestConnected
+                  ? pinterestAccount || 'Connected'
+                  : 'Demo Mode'}
+              </div>
+            )}
             <div className="text-[11px] text-emerald-400 font-medium flex items-center gap-1.5 mt-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
               <span>{isPinterestConnected ? 'Credentials Connected' : 'Credentials Active'}</span>
@@ -599,8 +608,22 @@ export default function DashboardPage() {
 
             {/* Queue Items List */}
             {isLoading ? (
-              <div className="space-y-3 py-8 text-center text-xs text-zinc-500 animate-pulse">
-                Loading automated queue status...
+              <div className="space-y-3">
+                {[1, 2, 3, 4].map((n) => (
+                  <div
+                    key={n}
+                    className="p-3.5 rounded-xl border border-zinc-800/80 bg-zinc-950/60 flex items-center justify-between gap-4"
+                  >
+                    <div className="space-y-2 flex-1">
+                      <div className="flex items-center gap-2">
+                        <Skeleton width={70} height={18} className="rounded-full" />
+                        <Skeleton width={90} height={14} className="rounded-md" />
+                      </div>
+                      <Skeleton width="75%" height={14} className="rounded-md" />
+                    </div>
+                    <Skeleton width={80} height={28} className="rounded-lg flex-shrink-0" />
+                  </div>
+                ))}
               </div>
             ) : displayedJobs.length === 0 ? (
               <div className="text-center py-12 space-y-3">
@@ -718,7 +741,19 @@ export default function DashboardPage() {
               </Link>
             </div>
 
-            {gallery.length === 0 ? (
+            {isLoading ? (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {[1, 2, 3, 4].map((n) => (
+                  <div
+                    key={n}
+                    className="rounded-xl overflow-hidden aspect-[2/3] bg-zinc-950 border border-zinc-800/80 p-2 flex flex-col justify-between"
+                  >
+                    <Skeleton width="100%" height="75%" className="rounded-lg" />
+                    <Skeleton width="80%" height={12} className="rounded-md mt-2" />
+                  </div>
+                ))}
+              </div>
+            ) : gallery.length === 0 ? (
               <div className="text-center py-8 text-xs text-zinc-500">
                 No creations generated yet. Test the Quick Synthesizer above!
               </div>

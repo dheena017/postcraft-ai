@@ -1,12 +1,12 @@
-import { AspectRatioConfig, StylePreset } from '@/types/image';
+import { AspectRatioConfig, StylePreset, LightingPreset } from '@/types/image';
 
 export const ASPECT_RATIOS: AspectRatioConfig[] = [
   {
     label: '2:3 Vertical (Pinterest Optimal)',
     ratio: '2:3',
-    width: 1000,
-    height: 1500,
-    description: 'Standard optimal format for Pinterest pins, max feed engagement',
+    width: 896,
+    height: 1344,
+    description: 'Native FLUX/SDXL 1.2MP resolution for razor-sharp Pinterest pins',
     isPinterestOptimal: true,
   },
   {
@@ -14,21 +14,21 @@ export const ASPECT_RATIOS: AspectRatioConfig[] = [
     ratio: '1:1',
     width: 1024,
     height: 1024,
-    description: 'Instagram feed & general social post standard',
+    description: 'Instagram feed & social post square standard (1024x1024 native)',
   },
   {
     label: '9:16 Full Story / Reel',
     ratio: '9:16',
-    width: 1080,
-    height: 1920,
-    description: 'Mobile full-screen story and pin format',
+    width: 768,
+    height: 1344,
+    description: 'Mobile full-screen vertical stories and reels (768x1344 native)',
   },
   {
     label: '16:9 Landscape',
     ratio: '16:9',
-    width: 1280,
-    height: 720,
-    description: 'Blog hero, YouTube thumbnail, and website banners',
+    width: 1344,
+    height: 768,
+    description: 'Blog hero, YouTube thumbnail, and website banner (1344x768 native)',
   },
 ];
 
@@ -40,6 +40,7 @@ export const STYLE_PRESETS: StylePreset[] = [
     promptSuffix: 'aesthetic photography, minimalist composition, soft natural lighting, warm pastel tones, clean lines, high-end magazine editorial, 8k resolution, award-winning',
     negativePrompt: 'watermark, logo, text, branding, blurry, low resolution, ugly, distorted, noisy',
     previewGradient: 'from-amber-200 via-rose-200 to-indigo-200',
+    category: 'aesthetic',
   },
   {
     id: 'photorealistic-8k',
@@ -48,6 +49,7 @@ export const STYLE_PRESETS: StylePreset[] = [
     promptSuffix: 'shot on 35mm lens, f/1.8 aperture, photorealistic, cinematic lighting, ultra-detailed texture, depth of field, Hasselblad medium format photo, masterwork',
     negativePrompt: 'watermark, text, signature, low quality, cartoon, drawing, deformed eyes, extra limbs',
     previewGradient: 'from-blue-600 via-slate-700 to-zinc-900',
+    category: 'aesthetic',
   },
   {
     id: 'interior-design',
@@ -56,6 +58,7 @@ export const STYLE_PRESETS: StylePreset[] = [
     promptSuffix: 'Architectural Digest interior photograph, Scandinavian modern decor, natural morning sunlight, cozy atmosphere, oak wood, marble accents, wide angle lens, high resolution',
     negativePrompt: 'watermark, logo, text, clutter, dark, blurry, distorted perspective',
     previewGradient: 'from-emerald-300 via-teal-400 to-stone-500',
+    category: 'interior',
   },
   {
     id: 'watercolor-art',
@@ -64,6 +67,7 @@ export const STYLE_PRESETS: StylePreset[] = [
     promptSuffix: 'masterpiece watercolor painting, delicate brushwork, translucent color washes, wet-on-wet technique, fine art paper texture, dreamy lighting, pastel aesthetic',
     negativePrompt: 'watermark, photo, 3d render, plastic, neon, jagged lines, text, signature',
     previewGradient: 'from-pink-300 via-purple-300 to-cyan-300',
+    category: 'art',
   },
   {
     id: 'modern-infographic',
@@ -72,6 +76,7 @@ export const STYLE_PRESETS: StylePreset[] = [
     promptSuffix: 'modern vector illustration, clean lines, flat design, Behance trending graphic design, harmonious palette, isolated aesthetic composition',
     negativePrompt: 'watermark, signature, photorealistic, noise, grainy, low-res',
     previewGradient: 'from-violet-500 via-purple-500 to-pink-500',
+    category: 'art',
   },
   {
     id: 'vintage-retro',
@@ -80,6 +85,7 @@ export const STYLE_PRESETS: StylePreset[] = [
     promptSuffix: 'vintage 35mm film photograph, Kodak Portra 400 aesthetic, nostalgic warm tones, subtle film grain, soft highlights, authentic vintage editorial',
     negativePrompt: 'watermark, digital, CGI, oversaturated, modern digital look, text',
     previewGradient: 'from-amber-400 via-orange-500 to-red-600',
+    category: 'aesthetic',
   },
   {
     id: 'luxury-editorial',
@@ -88,6 +94,7 @@ export const STYLE_PRESETS: StylePreset[] = [
     promptSuffix: 'high fashion luxury editorial, Vogue magazine shoot, dramatic chiaroscuro studio lighting, opulent elegance, sleek and sophisticated, 8k professional commercial shoot',
     negativePrompt: 'watermark, cheap, low quality, bad lighting, text, watermark logo',
     previewGradient: 'from-yellow-500 via-amber-600 to-zinc-900',
+    category: 'fashion-lifestyle',
   },
   {
     id: 'cyberpunk-neon',
@@ -96,5 +103,191 @@ export const STYLE_PRESETS: StylePreset[] = [
     promptSuffix: 'cyberpunk aesthetic, vibrant neon reflections, atmospheric rain, moody volumetric lighting, futuristic city details, octane render, Unreal Engine 5 look',
     negativePrompt: 'watermark, daylight, text, flat, dull colors, low resolution',
     previewGradient: 'from-fuchsia-600 via-purple-700 to-cyan-500',
+    category: 'art',
+  },
+  {
+    id: 'cozy-foodie',
+    name: 'Cozy Cafe & Foodie Pop',
+    description: 'Artisanal culinary photography, creamy bokeh, delicious warm tones',
+    promptSuffix: 'artisanal culinary food photography, Bon Appetit magazine style, shallow depth of field, warm diffused kitchen light, macro texture, mouthwatering presentation, 8k sharp focus',
+    negativePrompt: 'watermark, artificial, plastic food, dull colors, bad lighting, blurry, text',
+    previewGradient: 'from-amber-400 via-orange-400 to-yellow-200',
+    category: 'fashion-lifestyle',
+  },
+  {
+    id: 'boho-botanical',
+    name: 'Boho Earth & Botanicals',
+    description: 'Terracotta ceramics, pampas grass, warm linen, earthy aesthetic',
+    promptSuffix: 'bohemian earthy aesthetic, dried pampas grass, terracotta pottery, organic raw linen textures, warm golden sunlight, earthy neutral color palette, Kinfolk lifestyle editorial',
+    negativePrompt: 'watermark, neon, synthetic, harsh lighting, cluttered, messy, text',
+    previewGradient: 'from-orange-300 via-amber-500 to-stone-600',
+    category: 'interior',
+  },
+  {
+    id: 'dark-academia',
+    name: 'Dark Academia & Moody',
+    description: 'Vintage leather, antique mahogany, moody candlelight & bronze',
+    promptSuffix: 'dark academia aesthetic, mahogany bookshelves, antique brass instruments, warm candlelight, deep rich shadows, vintage literature study, moody atmospheric lighting',
+    negativePrompt: 'watermark, oversaturated, neon, bright white background, cartoon, text',
+    previewGradient: 'from-stone-800 via-amber-950 to-zinc-900',
+    category: 'aesthetic',
+  },
+  {
+    id: 'pastel-dream',
+    name: 'Pastel Dream & Y2K',
+    description: 'Iridescent glow, dreamy lavender & baby pink cloud aesthetics',
+    promptSuffix: 'dreamy pastel aesthetic, soft iridescent reflections, cotton candy clouds, gentle dreamy glow, nostalgic Y2K soft focus, ethereal wonderland palette, clean aesthetic render',
+    negativePrompt: 'watermark, dark, gritty, harsh shadows, dirty, desaturated, text',
+    previewGradient: 'from-pink-300 via-purple-300 to-sky-300',
+    category: 'art',
+  },
+  {
+    id: 'old-money',
+    name: 'Old Money & Quiet Luxury',
+    description: 'Timeless elegance, equestrian club styling, cashmere neutrals',
+    promptSuffix: 'quiet luxury old money aesthetic, Ralph Lauren style country club setting, tailored cashmere, ivory and navy tones, warm soft daylight, timeless elegance, Leica M11 photography',
+    negativePrompt: 'watermark, cheap, gaudy, oversaturated, neon, flashy, low quality, text',
+    previewGradient: 'from-stone-200 via-amber-200 to-slate-700',
+    category: 'fashion-lifestyle',
+  },
+  {
+    id: 'botanical-greenhouse',
+    name: 'Botanical Greenhouse',
+    description: 'Lush exotic foliage, sun-dappled glasshouse, vibrant monstera leaves',
+    promptSuffix: 'sun-drenched Victorian greenhouse interior, lush tropical monstera and fiddle leaf figs, dew drops on leaves, dappled sunlight through glass roof, National Geographic quality nature photo',
+    negativePrompt: 'watermark, dry plants, plastic leaves, dark, blurry, low resolution, text',
+    previewGradient: 'from-emerald-400 via-teal-600 to-stone-800',
+    category: 'interior',
+  },
+  {
+    id: 'isometric-3d',
+    name: '3D Clay & Isometric',
+    description: 'Charming tactile 3D isometric scene, soft claymorphism, cute lighting',
+    promptSuffix: 'cute 3D isometric miniature scene, tactile claymorphism style, soft matte finish, Blender Cycles render, warm ambient occlusion, whimsical details, pastel colors, Behance trending',
+    negativePrompt: 'watermark, flat, photorealistic, noise, grainy, low-poly, text, signature',
+    previewGradient: 'from-sky-400 via-indigo-500 to-rose-400',
+    category: 'art',
+  },
+  {
+    id: 'street-editorial',
+    name: 'Street Fashion Editorial',
+    description: 'High-energy candid street fashion, golden hour urban vibes',
+    promptSuffix: 'candid street fashion editorial, Soho NYC background, golden hour natural backlight, 35mm Kodak Portra look, chic urban outfit, dynamic movement, Harper\'s Bazaar photography',
+    negativePrompt: 'watermark, staged studio look, flash reflection, ugly, blurry, text',
+    previewGradient: 'from-rose-500 via-amber-500 to-stone-900',
+    category: 'fashion-lifestyle',
+  },
+  {
+    id: 'custom',
+    name: 'Custom (Your Own Style)',
+    description: 'Use pure custom prompt keywords without any automated style suffixes',
+    promptSuffix: '',
+    negativePrompt: '',
+    previewGradient: 'from-fuchsia-500 via-rose-500 to-amber-400',
+    category: 'all',
+  },
+];
+
+export const LIGHTING_PRESETS: LightingPreset[] = [
+  {
+    id: 'auto',
+    name: 'Auto / Style Native',
+    icon: '✨',
+    description: 'Balances lighting organically with the chosen style preset',
+    promptModifier: '',
+  },
+  {
+    id: 'golden-hour',
+    name: 'Golden Hour',
+    icon: '🌅',
+    description: 'Warm amber sunset glow, long soft shadows, viral Pinterest warmth',
+    promptModifier: 'bathed in warm golden hour sunset light, amber lens flare, soft evening shadows, glowing atmospheric warmth',
+  },
+  {
+    id: 'morning-sun',
+    name: 'Morning Sun',
+    icon: '🌤️',
+    description: 'Crisp, bright natural window light with gentle morning haze',
+    promptModifier: 'bright morning daylight streaming through sheer linen curtains, fresh airy diffuse lighting, clean natural highlights',
+  },
+  {
+    id: 'moody-cinematic',
+    name: 'Moody & Cinematic',
+    icon: '🕯️',
+    description: 'Chiaroscuro contrast, candlelit ambiance, deep cozy shadows',
+    promptModifier: 'dramatic chiaroscuro lighting, deep cinematic contrast, soft candlelight glow, rich mysterious shadows, moody tone',
+  },
+  {
+    id: 'studio-softbox',
+    name: 'Studio Softbox',
+    icon: '💡',
+    description: 'Even commercial studio lighting, pristine clean reflections',
+    promptModifier: 'professional high-key studio softbox lighting, perfectly balanced even exposure, zero harsh shadows, commercial grade',
+  },
+  {
+    id: 'neon-twilight',
+    name: 'Neon & Twilight',
+    icon: '🔮',
+    description: 'Vivid ultraviolet neon rim light against twilight blue hour',
+    promptModifier: 'twilight blue hour ambiance accented with vivid neon edge highlights, dual-tone magenta and cyan rim light',
+  },
+];
+
+export interface InspirationCategory {
+  name: string;
+  id: string;
+  chips: { label: string; prompt: string; tag?: string }[];
+}
+
+export const INSPIRATION_CATEGORIES: InspirationCategory[] = [
+  {
+    name: 'Trending Pins',
+    id: 'trending',
+    chips: [
+      { label: 'Boho Boucle Lounge', prompt: 'Aesthetic bohemian living room with cream boucle sofa, pampas grass, warm golden sunshine, oak wood details' },
+      { label: 'Iced Matcha Glass', prompt: 'Minimalist iced matcha latte with vanilla cold foam in ribbed aesthetic glass, morning sunlight, wooden coaster' },
+      { label: 'Scandi Olive Kitchen', prompt: 'Moody Scandinavian kitchen with dark olive green shaker cabinets, white marble countertop, brass hardware, sunny window' },
+      { label: 'Autumn Capsule Flatlay', prompt: 'Autumn cozy capsule wardrobe flat lay with camel wool trench coat, cream cashmere sweater, leather Chelsea boots' },
+    ],
+  },
+  {
+    name: 'Home & Living',
+    id: 'home',
+    chips: [
+      { label: 'Japandi Bedroom', prompt: 'Japandi minimalist zen bedroom with low platform wooden bed, beige linen duvet, bonsai tree, soft diffused paper lantern light' },
+      { label: 'Cozy Reading Nook', prompt: 'Cozy bay window reading nook with plush floor cushions, stack of hardcover books, chunky knit wool throw, raining outside window' },
+      { label: 'Marble Bathroom Spa', prompt: 'Luxury modern bathroom with freestanding soaking tub, Calacatta gold marble walls, eucalyptus bundle, natural morning sunlight' },
+      { label: 'Sunroom Plant Oasis', prompt: 'Bright glass sunroom filled with lush tropical monsteras, hanging ferns, rattan peacock armchair, sunbeams streaming down' },
+    ],
+  },
+  {
+    name: 'Food & Recipes',
+    id: 'food',
+    chips: [
+      { label: 'Artisanal Berry Toast', prompt: 'Crisp sourdough toast topped with whipped honeycomb ricotta, fresh organic blackberries, dripping honey, edible flowers' },
+      { label: 'Fluffy Souffle Pancakes', prompt: 'Tower of ultra fluffy Japanese souffle pancakes with melting butter cube, warm maple syrup drip, dusting of powdered sugar' },
+      { label: 'Creamy Tuscan Pasta', prompt: 'Rich creamy Tuscan garlic pasta with sun-dried tomatoes, baby spinach, parmesan shavings in rustic ceramic bowl, rustic wooden table' },
+      { label: 'Cold Brew Glass', prompt: 'Crystal glass of vanilla bean cold brew coffee with swirling cream cloud, condensation beads, marble bar counter' },
+    ],
+  },
+  {
+    name: 'Fashion & Style',
+    id: 'fashion',
+    chips: [
+      { label: 'Old Money Cashmere', prompt: 'Old money aesthetic, tailored cream cashmere sweater, ivory pleated trousers, gold vintage wristwatch, manicured garden background' },
+      { label: 'Silk Slip & Pearls', prompt: 'Champagne silk slip dress flatlay with freshwater baroque pearl necklace, vintage perfume bottle, satin ballet flats' },
+      { label: 'Minimalist Leather Tote', prompt: 'Handcrafted cognac Italian leather tote bag styled with tortoiseshell sunglasses and a fresh croissant on marble cafe table' },
+      { label: 'Linen Summer Resort', prompt: 'Breezy white linen resort wear outfit, woven straw tote, handmade espadrilles, Mediterranean terracotta courtyard' },
+    ],
+  },
+  {
+    name: 'Quotes & Wellness',
+    id: 'wellness',
+    chips: [
+      { label: 'Zen Tea Ritual', prompt: 'Ceremonial Japanese matcha bowl with bamboo chasen whisk, delicate steam rising, zen black slate tray, minimalist tranquility' },
+      { label: 'Morning Journaling Desk', prompt: 'Linen notebook with gold fountain pen, ceramic mug of steaming chai, eucalyptus branch, gentle morning sunlight on oak desk' },
+      { label: 'Botanical Bath Salts', prompt: 'Aesthetic glass apothecary jar of pink Himalayan bath salts with dried rose petals, linen towel, soothing candle glow' },
+      { label: 'Mindful Affirmation Card', prompt: 'Minimalist aesthetic inspirational quote card on textured cotton paper, dried lavender sprig, soft linen backdrop' },
+    ],
   },
 ];

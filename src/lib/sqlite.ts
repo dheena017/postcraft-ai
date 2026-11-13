@@ -35,6 +35,7 @@ export function getSqliteDb(): DatabaseSync {
         destinationUrl TEXT,
         aspectRatio TEXT NOT NULL DEFAULT '2:3',
         stylePreset TEXT NOT NULL DEFAULT 'aesthetic-minimal',
+        model TEXT NOT NULL DEFAULT 'flux',
         providerId TEXT NOT NULL DEFAULT 'pinterest',
         scheduledFor TEXT NOT NULL,
         status TEXT NOT NULL DEFAULT 'PENDING',
@@ -56,6 +57,7 @@ export function getSqliteDb(): DatabaseSync {
         height INTEGER NOT NULL,
         aspectRatio TEXT NOT NULL,
         seed INTEGER NOT NULL,
+        model TEXT NOT NULL DEFAULT 'flux',
         createdAt TEXT NOT NULL
       );
 
@@ -86,6 +88,15 @@ export function getSqliteDb(): DatabaseSync {
       }
       if (!colNames.has('externalPostUrl')) {
         dbInstance.exec('ALTER TABLE jobs ADD COLUMN externalPostUrl TEXT;');
+      }
+      if (!colNames.has('model')) {
+        dbInstance.exec("ALTER TABLE jobs ADD COLUMN model TEXT NOT NULL DEFAULT 'flux';");
+      }
+
+      const galleryCols = dbInstance.prepare("PRAGMA table_info(gallery)").all() as Array<{ name: string }>;
+      const galleryColNames = new Set(galleryCols.map((c) => c.name));
+      if (!galleryColNames.has('model')) {
+        dbInstance.exec("ALTER TABLE gallery ADD COLUMN model TEXT NOT NULL DEFAULT 'flux';");
       }
 
       if (colNames.has('publishedPostId')) {
